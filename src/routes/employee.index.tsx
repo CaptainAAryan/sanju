@@ -3,8 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, LogOut, MessageSquare, User, Phone, Send, Edit2, Check, X, Languages, Loader2, Users, Activity, Globe2, RefreshCw, Menu } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { Logo } from "@/components/Logo";
-import { employeeLogout, useEmployeeAuth } from "@/lib/employee-store";
-import { useStore, ageFromDob, fetchProfiles } from "@/lib/user-store";
+import { employeeLogout, useEmployeeState } from "@/lib/employee-store";
+import { ageFromDob, type UserProfile } from "@/lib/user-store";
+import { supabase } from "@/integrations/supabase/client";
+import { getEmployeeDemographics } from "@/lib/employee-demographics.functions";
 import { useChatThreads, listThreads, appendAssistantMessage, editMessageText, getThread, fetchAllThreads, allThreads } from "@/lib/chat-store";
 import { LANG_NAME } from "@/lib/i18n";
 
@@ -12,8 +14,18 @@ export const Route = createFileRoute("/employee/")({ component: EmployeePanel })
 
 function EmployeePanel() {
   const nav = useNavigate();
-  const authed = useEmployeeAuth();
-  const store = useStore();
+  const { authed, hydrated } = useEmployeeState();
+  const [profiles, setProfiles] = useState<UserProfile[]>([]);
+  const [loadError, setLoadError] = useState("");
+  async function loadProfiles() {
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) throw new Error("Please sign in again.");
+      const rows = await getEmployeeDemographics({ data: { accessToken: data.session.access_token } });
+      setProfiles(rows as UserProfile[]);
+      setLoadError("");
+    } catch (error) { setLoadError(error instanceof Error ? error.message : "Could not load members."); }
+  }
   useChatThreads();
   const threads = allThreads();
 
@@ -22,33 +34,33 @@ function EmployeePanel() {
   const [refreshing, setRefreshing] = useState(false);
   const [pane, setPane] = useState<"users" | "chats" | "convo">("users");
 
-  useEffect(() => { if (!authed) nav({ to: "/employee/login" }); }, [authed, nav]);
-  useEffect(() => { if (authed) { void fetchProfiles(); void fetchAllThreads(); } }, [authed]);
+  useEffect(() => { if (hydrated && !authed) nav({ to: "/employee/login" }); }, [hydrated, authed, nav]);
+  useEffect(() => { if (authed) { void loadProfiles(); void fetchAllThreads(); } }, [authed]);
   if (!authed) return null;
 
-  const selectedUser = store.profiles.find((p) => p.id === selectedUserId) ?? null;
+  const selectedUser = profiles.find((p) => p.id === selectedUserId) ?? null;
   const userThreads = selectedUser ? listThreads(selectedUser.id) : [];
   const selectedThread = selectedThreadId ? getThread(selectedThreadId) : null;
 
   // ---------- Global stats ----------
-  const totalUsers = store.profiles.length;
+  const totalUsers = profiles.length;
   const totalThreads = threads.length;
   const totalMsgs = threads.reduce((n, t) => n + t.messages.length, 0);
   const dayMs = 24 * 60 * 60 * 1000;
   const today = Date.now() - dayMs;
   const week = Date.now() - 7 * dayMs;
-  const newToday = store.profiles.filter((p) => p.createdAt >= today).length;
-  const newWeek = store.profiles.filter((p) => p.createdAt >= week).length;
+  const newToday = profiles.filter((p) => p.createdAt >= today).length;
+  const newWeek = profiles.filter((p) => p.createdAt >= week).length;
   const activeWeek = new Set(threads.filter((t) => t.updatedAt >= week).map((t) => t.userId)).size;
   const langCounts: Record<string, number> = {};
-  store.profiles.forEach((p) => { langCounts[p.lang] = (langCounts[p.lang] ?? 0) + 1; });
+  profiles.forEach((p) => { langCounts[p.lang] = (langCounts[p.lang] ?? 0) + 1; });
   const genderCounts: Record<string, number> = { female: 0, male: 0, other: 0 };
-  store.profiles.forEach((p) => { if (p.gender) genderCounts[p.gender] = (genderCounts[p.gender] ?? 0) + 1; });
+  profiles.forEach((p) => { if (p.gender) genderCounts[p.gender] = (genderCounts[p.gender] ?? 0) + 1; });
 
   function doLogout() { employeeLogout(); nav({ to: "/" }); }
   async function refresh() {
     setRefreshing(true);
-    await Promise.all([fetchProfiles(), fetchAllThreads()]);
+    await Promise.all([loadProfiles(), fetchAllThreads()]);
     setRefreshing(false);
   }
 
@@ -74,6 +86,7 @@ function EmployeePanel() {
         </div>
       </header>
 
+      {loadError && <p role="alert" className="mx-auto max-w-7xl px-5 py-2 text-destructive">{loadError}</p>}
       {/* Global stats */}
       <div className="mx-auto max-w-7xl px-4 sm:px-5 pt-4">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
@@ -104,10 +117,10 @@ function EmployeePanel() {
             Members · {totalUsers}
           </div>
           <div className="overflow-y-auto flex-1">
-            {store.profiles.length === 0 && (
+            {profiles.length === 0 && (
               <p className="p-4 text-xs text-muted-foreground">No registered users yet.</p>
             )}
-            {store.profiles
+            {profiles
               .slice()
               .sort((a, b) => b.createdAt - a.createdAt)
               .map((p) => {

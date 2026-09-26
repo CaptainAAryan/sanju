@@ -4,7 +4,7 @@ import { ArrowRight, ArrowLeft, Lock, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { t } from "@/lib/i18n";
-import { setDraft, useDraft, signUpWithPassword } from "@/lib/user-store";
+import { useDraft, signUpWithPassword } from "@/lib/user-store";
 
 export const Route = createFileRoute("/onboarding/password")({
   component: PasswordPage,
@@ -14,7 +14,7 @@ function PasswordPage() {
   const draft = useDraft();
   const nav = useNavigate();
   const dict = t[draft.lang ?? "en"];
-  const [pw, setPw] = useState(draft.password ?? "");
+  const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +29,6 @@ function PasswordPage() {
     const res = await signUpWithPassword(draft.mobile, pw);
     setBusy(false);
     if (res.error) return setError(res.error);
-    setDraft({ password: pw });
     nav({ to: "/onboarding/name" });
   }
 

@@ -18,7 +18,7 @@ export interface UserProfile {
   createdAt: number;
 }
 
-export type Draft = Partial<Omit<UserProfile, "id" | "createdAt">> & { password?: string };
+export type Draft = Partial<Omit<UserProfile, "id" | "createdAt">>;
 
 interface Store {
   profiles: UserProfile[];
@@ -44,7 +44,10 @@ function loadLocal() {
   try {
     const d = window.localStorage.getItem(DRAFT_KEY);
     const a = window.localStorage.getItem(ACTIVE_KEY);
-    state = { ...state, draft: d ? JSON.parse(d) : {}, activeId: a };
+    const draft = d ? JSON.parse(d) : {};
+    delete draft.password; // remove passwords saved by older versions
+    state = { ...state, draft, activeId: a };
+    saveDraft(draft);
   } catch {}
 }
 function saveDraft(d: Draft) {
@@ -191,6 +194,14 @@ export async function signInWithPassword(mobile: string, password: string): Prom
   if (error) return { error: "Invalid mobile or password." };
   await fetchProfiles();
   return {};
+}
+
+export async function signInWithGoogle(): Promise<{ error?: string }> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${window.location.origin}/auth/callback` },
+  });
+  return error ? { error: error.message } : {};
 }
 
 // ---------- Profile selection ----------

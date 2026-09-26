@@ -4,7 +4,7 @@ import { ArrowRight, ArrowLeft, Phone } from "lucide-react";
 import { useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { t } from "@/lib/i18n";
-import { setDraft, useDraft } from "@/lib/user-store";
+import { setDraft, useDraft, useHasSession } from "@/lib/user-store";
 import { getCountry } from "@/lib/countries";
 
 export const Route = createFileRoute("/onboarding/mobile")({
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/onboarding/mobile")({
 
 function MobilePage() {
   const draft = useDraft();
+  const hasSession = useHasSession();
   const nav = useNavigate();
   const dict = t[draft.lang ?? "en"];
   const country = getCountry(draft.country);
@@ -30,7 +31,7 @@ function MobilePage() {
       return setError(`That doesn't look like a valid ${country.name} mobile number.`);
     }
     setDraft({ mobile });
-    nav({ to: "/onboarding/password" });
+    nav({ to: hasSession ? "/onboarding/name" : "/onboarding/password" });
   }
 
   return (

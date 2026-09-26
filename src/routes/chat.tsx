@@ -83,6 +83,7 @@ function ChatPage() {
   const [input, setInput] = useState("");
   const [emergency, setEmergency] = useState(false);
   const [listening, setListening] = useState(false);
+  const [voiceError, setVoiceError] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const recRef = useRef<unknown>(null);
@@ -147,7 +148,7 @@ function ChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: text.slice(0, 2000), langName: LANG_NAME[lang] }),
       });
-      if (!res.ok) { setSpeakingId(null); return; }
+      if (!res.ok) { setVoiceError("Audio is unavailable right now. You can still read the reply."); setSpeakingId(null); return; }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const audio = cloudAudioRef.current ?? new Audio();
@@ -157,6 +158,7 @@ function ChatPage() {
       audio.onerror = () => setSpeakingId((s2) => (s2 === id ? null : s2));
       await audio.play();
     } catch {
+      setVoiceError("Could not play audio. Check your connection and try again.");
       setSpeakingId(null);
     }
   }
@@ -199,12 +201,14 @@ function ChatPage() {
 
   async function startCloudRecording() {
     try {
+      setVoiceError("");
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error("Microphone is unavailable in this browser.");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const ctx = new AudioContext();
       const source = ctx.createMediaStreamSource(stream);
       const node = ctx.createScriptProcessor(4096, 1, 1);
       const chunks: Float32Array[] = [];
-      node.onaudioprocess = (e) => chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+      node.onaudioprocess = (e) => { if (chunks.length * 4096 < ctx.sampleRate * 25) chunks.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
       source.connect(node);
       node.connect(ctx.destination);
       setListening(true);
@@ -237,13 +241,13 @@ function ChatPage() {
         fd.append("file", new Blob([buf], { type: "audio/wav" }), "recording.wav");
         fd.append("language", lang.slice(0, 2));
         const res = await fetch("/api/stt", { method: "POST", body: fd });
-        if (!res.ok) return;
+        if (!res.ok) { setVoiceError("Could not understand the recording. Please type your question or try again."); return; }
         const { text } = (await res.json()) as { text?: string };
         if (text?.trim()) { setInput(text.trim()); handleSend(text.trim()); }
       };
-    } catch {
+    } catch (error) {
       setListening(false);
-      alert("Microphone access is needed for voice input.");
+      setVoiceError(error instanceof Error && error.message.includes("unavailable") ? error.message : "Allow microphone access in your browser and try again.");
     }
   }
 
@@ -424,7 +428,7 @@ function ChatPage() {
               type="button"
               onClick={toggleMic}
               aria-label="Voice input"
-              className={`size-11 rounded-full grid place-items-center shrink-0 transition ${
+              className={`size-14 rounded-full grid place-items-center shrink-0 transition ${
                 listening ? "bg-emergency text-white animate-pulse-ring" : "bg-gradient-primary text-primary-foreground shadow-soft"
               }`}
             >
@@ -436,7 +440,7 @@ function ChatPage() {
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
               placeholder={dict.chatPlaceholder}
               rows={1}
-              className="flex-1 rounded-2xl bg-card border border-border px-4 py-3 text-sm outline-none focus:border-primary resize-none max-h-32"
+              className="flex-1 rounded-2xl bg-card border-2 border-border px-4 py-4 text-base outline-none focus:border-primary resize-none max-h-32"
             />
             {status === "streaming" ? (
               <button type="button" onClick={() => stop()} aria-label="Stop" className="size-11 rounded-full bg-muted text-foreground grid place-items-center shrink-0">
@@ -444,11 +448,13 @@ function ChatPage() {
               </button>
             ) : (
               <button type="submit" disabled={!input.trim()} aria-label="Send"
-                className="size-11 rounded-full bg-gradient-primary text-primary-foreground grid place-items-center shrink-0 shadow-glow disabled:opacity-40">
+                className="size-14 rounded-full bg-gradient-primary text-primary-foreground grid place-items-center shrink-0 shadow-glow disabled:opacity-40">
                 <Send className="size-5" />
               </button>
             )}
           </form>
+          {voiceError && <p role="alert" className="mt-2 text-center text-sm text-destructive">{voiceError}</p>}
+          <p className="mt-2 text-center text-xs text-muted-foreground">Tap 🎤 to speak. Tap again to finish.</p>
           <p className="text-[10px] text-muted-foreground text-center mt-2">⚕️ {dict.disclaimer}</p>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Shield, Heart, Globe, Mic, MessageCircle, LogIn, UserPlus, Settings, Flower2 } from "lucide-react";
+import { ArrowRight, Sparkles, Shield, Heart, Globe, Mic, MessageCircle, LogIn, UserPlus, Settings } from "lucide-react";
 import { Logo, LogoFull } from "@/components/Logo";
 import { PageShell, Disclaimer } from "@/components/PageShell";
 import { EmergencyBar } from "@/components/EmergencyBar";
@@ -278,14 +278,6 @@ function Landing() {
       <Disclaimer text="" />
       <span className="sr-only"><MessageCircle /></span>
 
-      {/* Hidden team-access flower (internal) */}
-      <Link
-        to="/employee/login"
-        aria-label="Sanjeevni"
-        className="fixed bottom-3 left-3 z-50 size-8 rounded-full bg-transparent text-foreground/20 hover:text-primary/70 grid place-items-center transition opacity-40 hover:opacity-100"
-      >
-        <Flower2 className="size-4" />
-      </Link>
     </PageShell>
   );
 }

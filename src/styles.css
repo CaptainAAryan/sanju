@@ -58,12 +58,12 @@
   --popover-foreground: oklch(0.36 0.028 60);
 
   /* Primary: Sage Green #6E7D5A */
-  --primary: oklch(0.535 0.052 122);
+  --primary: oklch(0.45 0.105 135);
   --primary-foreground: oklch(0.98 0.012 75);
-  --primary-glow: oklch(0.70 0.060 122);
+  --primary-glow: oklch(0.69 0.13 135);
 
   /* Secondary: Terracotta #C68C7A → use C68C7A from kit (warm coral-brown) */
-  --secondary: oklch(0.67 0.075 38);
+  --secondary: oklch(0.62 0.13 38);
   --secondary-foreground: oklch(0.98 0.012 75);
 
   --muted: oklch(0.92 0.018 75);
@@ -89,7 +89,7 @@
   --schemes: oklch(0.62 0.08 80);
 
   /* Gradients — sage → terracotta → moss */
-  --gradient-primary: linear-gradient(135deg, oklch(0.535 0.052 122), oklch(0.67 0.075 38));
+  --gradient-primary: linear-gradient(125deg, oklch(0.42 0.10 137), oklch(0.58 0.12 87), oklch(0.63 0.14 38));
   --gradient-soft: linear-gradient(180deg, oklch(0.97 0.012 75), oklch(0.92 0.022 75));
   --gradient-hero: radial-gradient(ellipse at top right, oklch(0.75 0.045 125 / 0.45), transparent 60%),
                    radial-gradient(ellipse at top left, oklch(0.78 0.06 38 / 0.35), transparent 55%),

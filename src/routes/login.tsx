@@ -5,7 +5,7 @@ import { ArrowLeft, Phone, ArrowRight, UserPlus, Lock, Eye, EyeOff } from "lucid
 import { PageShell } from "@/components/PageShell";
 import { Logo } from "@/components/Logo";
 import { t } from "@/lib/i18n";
-import { useStore, setActive, signInWithPassword, clearDraft, setDraft } from "@/lib/user-store";
+import { useStore, setActive, signInWithPassword, signInWithGoogle, clearDraft, setDraft } from "@/lib/user-store";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -35,13 +35,7 @@ function LoginPage() {
     setBusy(false);
     if (res.error) return setError(res.error);
     setSignedIn(true);
-    // If only one profile, jump directly
-    setTimeout(() => {
-      if (store.profiles.length === 1) {
-        setActive(store.profiles[0].id);
-        nav({ to: "/dashboard" });
-      }
-    }, 200);
+    // The profile store may update after this render; selection is shown below.
   }
 
   function pick(id: string) {
@@ -135,6 +129,18 @@ function LoginPage() {
             </div>
           </>
         )}
+
+        {!signedIn && <div className="mt-5">
+          <div className="text-center text-sm text-muted-foreground mb-4">or</div>
+          <button type="button" disabled={busy} onClick={async () => {
+            setBusy(true);
+            try { const result = await signInWithGoogle(); if (result.error) setError(result.error); }
+            catch { setError("Google sign in is unavailable. Please try again."); }
+            finally { setBusy(false); }
+          }} className="w-full min-h-14 rounded-2xl border-2 border-primary/30 bg-white text-foreground font-bold flex items-center justify-center gap-3 shadow-card">
+            <span className="text-xl font-bold text-blue-600" aria-hidden="true">G</span> Continue with Google
+          </button>
+        </div>}
 
         <div className="mt-8 text-center text-xs text-muted-foreground">
           New here? <button onClick={registerNew} className="text-primary font-semibold hover:underline">{dict.register}</button>

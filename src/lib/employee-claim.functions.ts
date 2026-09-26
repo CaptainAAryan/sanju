@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { timingSafeEqual } from "node:crypto";
 
@@ -17,19 +16,21 @@ export const verifyEmployeeGate = createServerFn({ method: "POST" })
   .handler(async ({ data }) => ({ ok: validGatePassword(data.gatePassword) }));
 
 export const claimEmployeeRole = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
     z.object({
       name: z.string().trim().min(1).max(120),
       gatePassword: z.string().min(1).max(200),
+      accessToken: z.string().min(10),
     }).parse(input),
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     if (!validGatePassword(data.gatePassword)) {
       return { ok: false as const, error: "Invalid team passcode." };
     }
-    const userId = context.userId;
-    const email = context.claims?.email ?? "";
+    const { data: auth, error: authError } = await supabaseAdmin.auth.getUser(data.accessToken);
+    if (authError || !auth.user) return { ok: false as const, error: "Please sign in again." };
+    const userId = auth.user.id;
+    const email = auth.user.email ?? "";
 
     // Insert role (idempotent via unique constraint)
     const { error: roleErr } = await supabaseAdmin

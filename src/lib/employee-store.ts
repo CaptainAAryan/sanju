@@ -108,7 +108,9 @@ export async function employeeSignUp(name: string, email: string, password: stri
   }
 
   const { claimEmployeeRole } = await import("@/lib/employee-claim.functions");
-  const res = await claimEmployeeRole({ data: { name, gatePassword } });
+  const { data: session } = await supabase.auth.getSession();
+  if (!session.session) return { error: "Please sign in again." };
+  const res = await claimEmployeeRole({ data: { name, gatePassword, accessToken: session.session.access_token } });
   if (!res?.ok) return { error: res?.error ?? "Could not register as employee." };
 
   await refreshEmployee();

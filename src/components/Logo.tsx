@@ -1,9 +1,6 @@
 import { motion } from "framer-motion";
-import markAsset from "@/assets/sanjeevni-mark.png.asset.json";
-import fullAsset from "@/assets/sanjeevni-logo-full.jpeg.asset.json";
-
-const MARK_URL = markAsset.url; // transparent symbol-only
-const FULL_URL = fullAsset.url; // wordmark version (used in 404/loading where text is welcome)
+const MARK_URL = "/project-sanjeevni-logo.jpeg";
+const FULL_URL = "/project-sanjeevni-logo.jpeg";
 
 /** Symbol-only logo (for headers/nav). Transparent PNG, no text. */
 export function Logo({ size = 44, withText = false }: { size?: number; withText?: boolean }) {
@@ -21,7 +18,7 @@ export function Logo({ size = 44, withText = false }: { size?: number; withText?
           alt="Project Sanjeevni"
           width={size}
           height={size}
-          className="block object-contain w-full h-full"
+          className="block object-cover rounded-full w-full h-full"
         />
       </motion.div>
       {withText && (

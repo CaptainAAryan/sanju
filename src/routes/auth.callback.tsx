@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchProfiles, useStore } from "@/lib/user-store";
+import { fetchProfiles, getDraftSnapshot, useStore } from "@/lib/user-store";
 import { PageShell } from "@/components/PageShell";
 
 export const Route = createFileRoute("/auth/callback")({ component: AuthCallback });
@@ -27,7 +27,8 @@ function AuthCallback() {
         await fetchProfiles();
         if (cancelled) return;
         const { data: rows } = await supabase.from("profiles").select("id").eq("user_id", data.session.user.id).limit(1);
-        nav({ to: rows?.length ? "/dashboard" : "/onboarding/language", replace: true });
+        const draft = getDraftSnapshot();
+        nav({ to: rows?.length ? "/dashboard" : draft.country && draft.lang ? "/onboarding/mobile" : "/onboarding/language", replace: true });
       } catch (e) { if (!cancelled) setError(e instanceof Error ? e.message : "Sign in failed."); }
     }
     void finish();

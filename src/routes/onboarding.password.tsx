@@ -26,10 +26,23 @@ function PasswordPage() {
     if (pw !== pw2) return setError("Passwords do not match.");
     if (!draft.mobile) return setError("Mobile missing. Please restart.");
     setBusy(true);
-    const res = await signUpWithPassword(draft.mobile, pw);
-    setBusy(false);
-    if (res.error) return setError(res.error);
-    nav({ to: "/onboarding/name" });
+    setError("");
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      const res = await Promise.race([
+        signUpWithPassword(draft.mobile, pw),
+        new Promise<{ error: string }>((resolve) => {
+          timer = setTimeout(() => resolve({ error: "Account creation is taking too long. Check your connection, then try signing in with this number or use Google." }), 20000);
+        }),
+      ]);
+      if (res.error) return setError(res.error);
+      nav({ to: "/onboarding/name" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not create your account. Please try again or use Google.");
+    } finally {
+      if (timer) clearTimeout(timer);
+      setBusy(false);
+    }
   }
 
   return (
@@ -81,6 +94,7 @@ function PasswordPage() {
             {busy ? "Creating account…" : dict.continue} <ArrowRight className="size-4" />
           </button>
         </form>
+        {error && <Link to="/onboarding/mobile" className="mt-5 block text-center text-sm font-semibold text-primary underline">Try Google sign in instead</Link>}
       </div>
     </PageShell>
   );

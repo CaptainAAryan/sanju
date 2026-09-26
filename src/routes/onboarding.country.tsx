@@ -7,7 +7,6 @@ import { StickyContinue } from "@/components/StickyContinue";
 import { COUNTRIES, getCountry } from "@/lib/countries";
 import { t } from "@/lib/i18n";
 import { setDraft, useDraft } from "@/lib/user-store";
-import { lookupPostal } from "@/lib/postal";
 
 export const Route = createFileRoute("/onboarding/country")({
   component: CountryPage,
@@ -22,20 +21,21 @@ function CountryPage() {
   const [error, setError] = useState("");
   const country = getCountry(code);
 
-  async function submit(e?: React.FormEvent) {
+  function submit(e: React.FormEvent) {
     e?.preventDefault();
     const trimmed = pincode.trim();
     setError("");
-    const res = await lookupPostal(code, trimmed);
-    if (!res.ok) return setError(res.error ?? "Invalid postal code.");
-    setDraft({ country: code, pincode: trimmed || undefined, city: res.city ?? null });
-    nav({ to: "/onboarding/language" });
+    if (trimmed && country.pincodeRegex && !country.pincodeRegex.test(trimmed)) {
+      return setError(`Please check your ${country.pincodeLabel.replace(/ \(optional\)/i, "").toLowerCase()}, or leave it blank.`);
+    }
+    setDraft({ country: code, pincode: trimmed || null, city: null });
+    nav({ to: "/onboarding/mobile" });
   }
 
   return (
     <PageShell>
       <div className="mx-auto max-w-2xl px-5 py-8">
-        <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <Link to="/onboarding/language" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-4" /> {dict.back}
         </Link>
 
@@ -57,7 +57,7 @@ function CountryPage() {
                 <button
                   key={c.code}
                   type="button"
-                  onClick={() => { setCode(c.code); setError(""); }}
+                  onClick={() => { if (code !== c.code) setPincode(""); setCode(c.code); setError(""); }}
                   className={`rounded-2xl border-2 p-3 text-left transition ${
                     active
                       ? "border-primary bg-gradient-primary text-primary-foreground shadow-glow"
@@ -87,15 +87,14 @@ function CountryPage() {
             {error && <p className="mt-1.5 text-sm text-destructive">{error}</p>}
             {!error && (
               <p className="mt-1.5 text-xs text-muted-foreground">
-                Optional — used for local schemes & helplines.
+                Optional. You can leave this blank and add it later.
               </p>
             )}
           </div>
 
-          <StickyContinue label={dict.continue} type="submit" onClick={() => submit()} show={!!code} />
+          <StickyContinue label={dict.continue} type="submit" show={!!code} />
         </form>
       </div>
     </PageShell>
   );
 }
-

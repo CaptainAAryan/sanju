@@ -55,12 +55,12 @@ function LanguagePage() {
         </div>
 
         <div className="mt-10 flex justify-between gap-3">
-          <Link to="/onboarding/country" className="inline-flex items-center gap-1.5 rounded-full bg-card border border-border px-5 py-3 text-sm font-semibold text-muted-foreground hover:text-foreground transition">
+          <Link to="/" className="inline-flex items-center gap-1.5 rounded-full bg-card border border-border px-5 py-3 text-sm font-semibold text-muted-foreground hover:text-foreground transition">
             <ArrowLeft className="size-4" /> {dict.back}
           </Link>
           <button
             disabled={!draft.lang}
-            onClick={() => nav({ to: "/onboarding/mobile" })}
+            onClick={() => nav({ to: "/onboarding/country" })}
             className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-7 py-3.5 font-semibold text-primary-foreground shadow-glow hover:scale-[1.02] transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {dict.continue} <ArrowRight className="size-4" />

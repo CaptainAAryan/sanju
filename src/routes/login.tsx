@@ -134,7 +134,7 @@ function LoginPage() {
           <div className="text-center text-sm text-muted-foreground mb-4">or</div>
           <button type="button" disabled={busy} onClick={async () => {
             setBusy(true);
-            try { const result = await signInWithGoogle(); if (result.error) setError(result.error); }
+            try { clearDraft(); const result = await signInWithGoogle(); if (result.error) setError(result.error); }
             catch { setError("Google sign in is unavailable. Please try again."); }
             finally { setBusy(false); }
           }} className="w-full min-h-14 rounded-2xl border-2 border-primary/30 bg-white text-foreground font-bold flex items-center justify-center gap-3 shadow-card">

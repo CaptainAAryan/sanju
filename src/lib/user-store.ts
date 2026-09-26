@@ -163,6 +163,10 @@ export function clearDraft() {
   saveDraft({});
   set({ draft: {} });
 }
+export function getDraftSnapshot(): Draft {
+  if (typeof window !== "undefined" && !inited) loadLocal();
+  return state.draft;
+}
 
 // ---------- Auth ----------
 export async function signUpWithPassword(mobile: string, password: string): Promise<{ error?: string }> {

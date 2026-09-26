@@ -4,7 +4,7 @@ import { ArrowRight, ArrowLeft, Phone } from "lucide-react";
 import { useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { t } from "@/lib/i18n";
-import { setDraft, useDraft, useHasSession } from "@/lib/user-store";
+import { setDraft, useDraft, useHasSession, signInWithGoogle } from "@/lib/user-store";
 import { getCountry } from "@/lib/countries";
 
 export const Route = createFileRoute("/onboarding/mobile")({
@@ -19,6 +19,7 @@ function MobilePage() {
   const country = getCountry(draft.country);
   const [mobile, setMobile] = useState(draft.mobile ?? "");
   const [error, setError] = useState("");
+  const [googleBusy, setGoogleBusy] = useState(false);
   const maxLen = Math.max(...country.mobileLengths);
 
   function submit(e: React.FormEvent) {
@@ -37,7 +38,7 @@ function MobilePage() {
   return (
     <PageShell>
       <div className="mx-auto max-w-md px-5 py-10">
-        <Link to="/onboarding/language" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <Link to="/onboarding/country" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-4" /> {dict.back}
         </Link>
 
@@ -72,6 +73,22 @@ function MobilePage() {
             {dict.continue} <ArrowRight className="size-4" />
           </button>
         </form>
+        {!hasSession && <div className="mt-6">
+          <p className="mb-3 text-center text-sm text-muted-foreground">Or use your Google account</p>
+          <button type="button" disabled={googleBusy} onClick={async () => {
+            setGoogleBusy(true);
+            setError("");
+            try {
+              if (mobile) setDraft({ mobile });
+              const result = await signInWithGoogle();
+              if (result.error) setError(result.error);
+            } catch { setError("Google sign in is unavailable right now. Please try again."); }
+            finally { setGoogleBusy(false); }
+          }} className="flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary/40 bg-white px-5 font-bold text-foreground shadow-card disabled:opacity-50">
+            <span aria-hidden="true" className="text-xl font-bold text-blue-600">G</span> Continue with Google
+          </button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">You can add your mobile number after signing in.</p>
+        </div>}
       </div>
     </PageShell>
   );

@@ -31,10 +31,15 @@ function LoginPage() {
     if (!valid) return setError("Enter a valid 10-digit mobile number.");
     if (pw.length < 6) return setError("Password must be at least 6 characters.");
     setBusy(true);
-    const res = await signInWithPassword(mobile, pw);
-    setBusy(false);
-    if (res.error) return setError(res.error);
-    setSignedIn(true);
+    try {
+      const res = await signInWithPassword(mobile, pw);
+      if (res.error) return setError(res.error);
+      setSignedIn(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign in is unavailable right now.");
+    } finally {
+      setBusy(false);
+    }
     // The profile store may update after this render; selection is shown below.
   }
 
@@ -135,7 +140,7 @@ function LoginPage() {
           <button type="button" disabled={busy} onClick={async () => {
             setBusy(true);
             try { clearDraft(); const result = await signInWithGoogle(); if (result.error) setError(result.error); }
-            catch { setError("Google sign in is unavailable. Please try again."); }
+            catch (err) { setError(err instanceof Error ? err.message : "Google sign in is unavailable right now."); }
             finally { setBusy(false); }
           }} className="w-full min-h-14 rounded-2xl border-2 border-primary/30 bg-white text-foreground font-bold flex items-center justify-center gap-3 shadow-card">
             <span className="text-xl font-bold text-blue-600" aria-hidden="true">G</span> Continue with Google

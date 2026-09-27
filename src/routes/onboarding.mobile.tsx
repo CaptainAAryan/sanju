@@ -82,7 +82,7 @@ function MobilePage() {
               if (mobile) setDraft({ mobile });
               const result = await signInWithGoogle();
               if (result.error) setError(result.error);
-            } catch { setError("Google sign in is unavailable right now. Please try again."); }
+            } catch (err) { setError(err instanceof Error ? err.message : "Google sign in is unavailable right now."); }
             finally { setGoogleBusy(false); }
           }} className="flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary/40 bg-white px-5 font-bold text-foreground shadow-card disabled:opacity-50">
             <span aria-hidden="true" className="text-xl font-bold text-blue-600">G</span> Continue with Google

@@ -194,7 +194,12 @@ export async function signUpWithPassword(mobile: string, password: string): Prom
 }
 
 export async function signInWithPassword(mobile: string, password: string): Promise<{ error?: string }> {
-  const { error } = await supabase.auth.signInWithPassword({ email: mobileToEmail(mobile), password });
+  let { error } = await supabase.auth.signInWithPassword({ email: mobileToEmail(mobile), password });
+  if (error) {
+    const legacyEmail = `m${mobile}@user.sanjeevni.local`;
+    const legacy = await supabase.auth.signInWithPassword({ email: legacyEmail, password });
+    if (!legacy.error) error = null;
+  }
   if (error) return { error: "Invalid mobile or password." };
   await fetchProfiles();
   return {};

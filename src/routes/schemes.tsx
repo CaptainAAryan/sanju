@@ -49,7 +49,24 @@ function SchemesPage() {
   const [q, setQ] = useState("");
 
   useEffect(() => { if (ready && !user && !hasSession) nav({ to: "/" }); }, [ready, user, nav]);
-  useEffect(() => { if (ready) setLoc(loadLocation()); }, [ready]);
+  useEffect(() => {
+    if (!ready || !user) return;
+    const cached = loadLocation();
+    if (cached) {
+      setLoc(cached);
+      setCity(cached.city);
+      setState(cached.state);
+      return;
+    }
+    const parts = (user.city ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+      const next = { city: parts[0], state: parts.slice(1).join(", "), country: user.country };
+      saveLocation(next);
+      setLoc(next);
+      setCity(next.city);
+      setState(next.state);
+    }
+  }, [ready, user]);
 
   if (!user) return null;
   const dict = t[user.lang] ?? t.en;
@@ -59,7 +76,7 @@ function SchemesPage() {
     (s) => !q || (s.title + s.preview + s.detail).toLowerCase().includes(q.toLowerCase()),
   );
 
-  const userCountry = getCountry(user?.country);
+  const userCountry = getCountry(user.country);
 
   function submitLocation(e: React.FormEvent) {
     e.preventDefault();

@@ -157,7 +157,7 @@ function Landing() {
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
             className="absolute top-1/3 -right-3 rounded-2xl glass px-3 py-2 text-xs font-semibold text-secondary shadow-soft"
           >
-            🩺 224/7
+            🩺 24/7
           </motion.div>
           <motion.div
             animate={{ y: [0, -12, 0] }}
@@ -235,7 +235,7 @@ function Landing() {
             {[
               { k: "20+", v: "Languages" },
               { k: "12", v: "Countries" },
-              { k: "224/7", v: "Always on" },
+              { k: "24/7", v: "Always on" },
             ].map((s) => (
               <div key={s.v}>
                 <div className="text-3xl md:text-5xl font-extrabold">{s.k}</div>

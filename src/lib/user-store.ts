@@ -6,7 +6,7 @@ export type Gender = "female" | "male" | "other";
 
 export interface UserProfile {
   id: string;
-  mobile: string;
+  mobile: string | null;
   name: string;
   dob: string | null;
   gender: Gender | null;
@@ -256,7 +256,7 @@ export async function updateActiveLang(lang: Lang) {
 // commitDraft: requires authed session; insert profile row
 export async function commitDraft(): Promise<UserProfile | { error: string }> {
   const d = state.draft;
-  if (!d.lang || !d.mobile || !d.name || !d.dob || !d.gender) {
+  if (!d.name || !d.dob || !d.gender) {
     return { error: "Please complete all steps." };
   }
   const { data: sess } = await supabase.auth.getUser();
@@ -265,7 +265,7 @@ export async function commitDraft(): Promise<UserProfile | { error: string }> {
     .from("profiles")
     .insert({
       user_id: sess.user.id,
-      mobile: d.mobile,
+      mobile: d.mobile ?? null,
       name: d.name,
       dob: d.dob,
       gender: d.gender,

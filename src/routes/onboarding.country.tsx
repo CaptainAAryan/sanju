@@ -1,13 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowLeft, Globe2 } from "lucide-react";
+import { ArrowLeft, Globe2, MapPin } from "lucide-react";
 import { useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { StickyContinue } from "@/components/StickyContinue";
 import { COUNTRIES, getCountry } from "@/lib/countries";
 import { t } from "@/lib/i18n";
 import { setDraft, useDraft } from "@/lib/user-store";
-import { lookupPostal } from "@/lib/postal";
 
 export const Route = createFileRoute("/onboarding/country")({
   component: CountryPage,
@@ -18,24 +17,21 @@ function CountryPage() {
   const nav = useNavigate();
   const dict = t[draft.lang ?? "en"];
   const [code, setCode] = useState(draft.country ?? "IN");
-  const [pincode, setPincode] = useState(draft.pincode ?? "");
+  const [city, setCity] = useState((draft.city ?? "").split(",")[0]?.trim() ?? "");
+  const [state, setState] = useState((draft.city ?? "").split(",").slice(1).join(",").trim());
   const [error, setError] = useState("");
   const country = getCountry(code);
 
-  async function submit(e: React.FormEvent) {
-    e?.preventDefault();
-    const trimmed = pincode.trim();
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmedCity = city.trim();
+    const trimmedState = state.trim();
+    if (!trimmedCity || !trimmedState) {
+      setError("Please enter your city/area and state or region.");
+      return;
+    }
     setError("");
-    if (trimmed && country.pincodeRegex && !country.pincodeRegex.test(trimmed)) {
-      return setError(`Please check your ${country.pincodeLabel.replace(/ \(optional\)/i, "").toLowerCase()}, or leave it blank.`);
-    }
-    let city: string | null = null;
-    if (trimmed) {
-      const result = await lookupPostal(code, trimmed);
-      if (!result.ok) return setError(result.error ?? "Please check your postal code.");
-      city = result.city ?? null;
-    }
-    setDraft({ country: code, pincode: trimmed || null, city });
+    setDraft({ country: code, pincode: null, city: `${trimmedCity}, ${trimmedState}` });
     nav({ to: "/onboarding/mobile" });
   }
 
@@ -64,12 +60,8 @@ function CountryPage() {
                 <button
                   key={c.code}
                   type="button"
-                  onClick={() => { if (code !== c.code) setPincode(""); setCode(c.code); setError(""); }}
-                  className={`rounded-2xl border-2 p-3 text-left transition ${
-                    active
-                      ? "border-primary bg-gradient-primary text-primary-foreground shadow-glow"
-                      : "border-border bg-card hover:border-primary/40 shadow-card"
-                  }`}
+                  onClick={() => { setCode(c.code); setError(""); }}
+                  className={`rounded-2xl border-2 p-3 text-left transition ${active ? "border-primary bg-gradient-primary text-primary-foreground shadow-glow" : "border-border bg-card hover:border-primary/40 shadow-card"}`}
                 >
                   <div className="text-2xl">{c.flag}</div>
                   <div className={`mt-1 font-bold text-sm ${active ? "" : "text-foreground"}`}>{c.name}</div>
@@ -79,24 +71,16 @@ function CountryPage() {
             })}
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">
-              {country.pincodeLabel}
-            </label>
-            <input
-              value={pincode}
-              onChange={(e) => { setPincode(e.target.value.replace(/[^a-zA-Z0-9 -]/g, "").slice(0, 12)); setError(""); }}
-              placeholder={country.pincodePlaceholder ?? "Postal code"}
-              inputMode="numeric"
-              className="w-full rounded-2xl bg-card border-2 border-border focus:border-primary px-5 py-3.5 text-base outline-none transition shadow-soft focus:shadow-glow tracking-wider"
-              aria-label={country.pincodeLabel}
-            />
-            {error && <p className="mt-1.5 text-sm text-destructive">{error}</p>}
-            {!error && (
-              <p className="mt-1.5 text-xs text-muted-foreground">
-                Optional. You can leave this blank and add it later.
-              </p>
-            )}
+          <div className="rounded-2xl bg-card border-2 border-border p-4 shadow-soft">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <MapPin className="size-4 text-primary" /> Your location
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">No PIN/postal code is needed.</p>
+            <div className="mt-3 grid sm:grid-cols-2 gap-3">
+              <input value={city} onChange={(e) => { setCity(e.target.value); setError(""); }} placeholder="City / area" className="w-full rounded-xl bg-muted border border-border focus:border-primary px-4 py-3 text-base outline-none" required />
+              <input value={state} onChange={(e) => { setState(e.target.value); setError(""); }} placeholder={code === "IN" ? "State" : "State / province / region"} className="w-full rounded-xl bg-muted border border-border focus:border-primary px-4 py-3 text-base outline-none" required />
+            </div>
+            {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
           </div>
 
           <StickyContinue label={dict.continue} type="submit" show={!!code} />

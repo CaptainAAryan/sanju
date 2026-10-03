@@ -1,3 +1,4 @@
+// Server-side signup uses the Vercel runtime Supabase service-role environment variable.
 import { createFileRoute } from "@tanstack/react-router";
 
 function internalEmail(mobile: string) {

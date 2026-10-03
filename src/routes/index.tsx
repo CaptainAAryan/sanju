@@ -157,7 +157,7 @@ function Landing() {
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
             className="absolute top-1/3 -right-3 rounded-2xl glass px-3 py-2 text-xs font-semibold text-secondary shadow-soft"
           >
-            🩺 24/7
+            🩺 224/7
           </motion.div>
           <motion.div
             animate={{ y: [0, -12, 0] }}

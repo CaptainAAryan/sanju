@@ -111,7 +111,7 @@ function SettingsPage() {
           <div className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">{dict.profileDetails}</div>
           <Row label={dict.mobile} value={`${getCountry(user.country).dialPrefix} ${user.mobile}`} />
           <Row label="Name" value={user.name} locked lockedLabel={dict.cannotEdit} />
-          <Row label={dict.dob} value={user.dob ?? "—"} locked lockedLabel={dict.cannotEdit} />
+          <Row label="Age" value={user.dob ? String(new Date().getFullYear() - new Date(user.dob).getFullYear()) : "—"} locked lockedLabel={dict.cannotEdit} />
           <Row label={dict.gender} value={dict[user.gender ?? "other"]} locked lockedLabel={dict.cannotEdit} />
           <Row label="Country" value={`${getCountry(user.country).flag} ${getCountry(user.country).name} (${getCountry(user.country).dialPrefix})`} />
         </section>

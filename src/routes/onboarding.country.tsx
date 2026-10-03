@@ -7,6 +7,7 @@ import { StickyContinue } from "@/components/StickyContinue";
 import { COUNTRIES, getCountry } from "@/lib/countries";
 import { t } from "@/lib/i18n";
 import { setDraft, useDraft } from "@/lib/user-store";
+import { lookupPostal } from "@/lib/postal";
 
 export const Route = createFileRoute("/onboarding/country")({
   component: CountryPage,
@@ -21,14 +22,20 @@ function CountryPage() {
   const [error, setError] = useState("");
   const country = getCountry(code);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e?.preventDefault();
     const trimmed = pincode.trim();
     setError("");
     if (trimmed && country.pincodeRegex && !country.pincodeRegex.test(trimmed)) {
       return setError(`Please check your ${country.pincodeLabel.replace(/ \(optional\)/i, "").toLowerCase()}, or leave it blank.`);
     }
-    setDraft({ country: code, pincode: trimmed || null, city: null });
+    let city: string | null = null;
+    if (trimmed) {
+      const result = await lookupPostal(code, trimmed);
+      if (!result.ok) return setError(result.error ?? "Please check your postal code.");
+      city = result.city ?? null;
+    }
+    setDraft({ country: code, pincode: trimmed || null, city });
     nav({ to: "/onboarding/mobile" });
   }
 

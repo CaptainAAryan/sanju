@@ -170,28 +170,25 @@ export function getDraftSnapshot(): Draft {
 
 // ---------- Auth ----------
 export async function signUpWithPassword(mobile: string, password: string): Promise<{ error?: string }> {
-  const email = mobileToEmail(mobile);
-  // Internal email identity only. Sanju does not need email verification.
-  const { data, error } = await supabase.auth.signUp({
-    email,
+  // Account creation is handled by our server route using Supabase Admin Auth.
+  // This avoids Supabase's public email-signup/email-sending rate limits.
+  try {
+    const response = await fetch("/api/auth/mobile-signup", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mobile, password }),
+    });
+    const payload = (await response.json().catch(() => ({}))) as { error?: string };
+    if (!response.ok) return { error: payload.error ?? "Could not create your account." };
+  } catch {
+    return { error: "Could not reach the account service. Please try again." };
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: mobileToEmail(mobile),
     password,
-    options: { data: { mobile } },
   });
-
-  if (error) {
-    const message = error.message ?? "";
-    if (/rate limit|too many requests|email rate limit/i.test(message)) {
-      return { error: "Supabase email rate limit reached. In Supabase Auth → Providers → Email, turn OFF Confirm Email, then try again." };
-    }
-    if (/already/i.test(message)) {
-      return { error: "This mobile number is already registered. Please log in." };
-    }
-    return { error: message };
-  }
-
-  if (!data.session) {
-    return { error: "Account created without a session. Turn OFF Confirm Email in Supabase Auth → Providers → Email, then try again." };
-  }
+  if (error) return { error: "Account was created, but automatic login failed. Please log in with your mobile number." };
 
   await fetchProfiles();
   return {};

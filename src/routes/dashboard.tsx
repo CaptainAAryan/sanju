@@ -61,6 +61,26 @@ function Dashboard() {
 
         <LocationPrompt user={user} />
 
+        {user.city && (
+          <div className="mt-3 grid sm:grid-cols-2 gap-3">
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`hospitals near ${user.city}`)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-2xl bg-card border border-border shadow-card p-4 hover:border-primary/40 transition flex items-center gap-3"
+            >
+              <div className="size-10 rounded-full bg-primary/10 grid place-items-center">🏥</div>
+              <div><div className="font-semibold text-sm">Nearby hospitals</div><div className="text-xs text-muted-foreground">Find hospitals around {user.city}</div></div>
+            </a>
+            <Link
+              to="/schemes"
+              className="rounded-2xl bg-card border border-border shadow-card p-4 hover:border-primary/40 transition flex items-center gap-3"
+            >
+              <div className="size-10 rounded-full bg-primary/10 grid place-items-center">🇮🇳</div>
+              <div><div className="font-semibold text-sm">Local schemes</div><div className="text-xs text-muted-foreground">Government health schemes for your area</div></div>
+            </Link>
+          </div>
+        )}
 
         <div className="mt-6 grid sm:grid-cols-[1fr_auto] gap-3 items-stretch">
           <Link to="/chat" className="block rounded-3xl p-1 bg-gradient-primary shadow-glow hover:shadow-soft transition hover:scale-[1.01]">

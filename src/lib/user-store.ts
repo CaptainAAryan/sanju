@@ -61,7 +61,7 @@ function saveActive(id: string | null) {
 }
 
 function mobileToEmail(mobile: string) {
-  return `m${mobile}@sanjeevni.ai`;
+  return `m${mobile}@user.sanjeevni.local`;
 }
 
 function rowToProfile(r: {

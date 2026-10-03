@@ -33,9 +33,8 @@ function ProfilePage() {
     const trimmed = name.trim();
     const years = Number(age);
     if (trimmed.length < 2 || !NAME_RX.test(trimmed)) return setError(dict.nameError);
-    if (!Number.isInteger(years) || years < 12 || years > 120) return setError("Please enter a valid age (12–120).");
+    if (!Number.isInteger(years) || years < 9 || years > 120) return setError("Please enter a valid age (9–120).");
     if (!gender) return setError("Please select your gender.");
-    if (!draft.mobile) return setError("Mobile number is missing. Please go back and enter it.");
 
     const now = new Date();
     const dob = new Date(now);

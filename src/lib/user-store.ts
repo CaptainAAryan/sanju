@@ -171,24 +171,28 @@ export function getDraftSnapshot(): Draft {
 // ---------- Auth ----------
 export async function signUpWithPassword(mobile: string, password: string): Promise<{ error?: string }> {
   const email = mobileToEmail(mobile);
-  const redirectUrl = typeof window !== "undefined" ? `${window.location.origin}/` : undefined;
-  const { error } = await supabase.auth.signUp({
-    email, password,
-    options: { emailRedirectTo: redirectUrl, data: { mobile } },
+  // Internal email identity only. Sanju does not need email verification.
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { mobile } },
   });
-  if (error && !/already/i.test(error.message ?? "")) {
-    return { error: error.message };
-  }
-  // Ensure active session (auto-confirm is enabled)
-  const { data: sess } = await supabase.auth.getSession();
-  if (!sess.session) {
-    const { error: signErr } = await supabase.auth.signInWithPassword({ email, password });
-    if (signErr) {
-      return { error: error?.message?.toLowerCase().includes("already")
-        ? "This mobile number is already registered. Please log in."
-        : signErr.message };
+
+  if (error) {
+    const message = error.message ?? "";
+    if (/rate limit|too many requests|email rate limit/i.test(message)) {
+      return { error: "Supabase email rate limit reached. In Supabase Auth → Providers → Email, turn OFF Confirm Email, then try again." };
     }
+    if (/already/i.test(message)) {
+      return { error: "This mobile number is already registered. Please log in." };
+    }
+    return { error: message };
   }
+
+  if (!data.session) {
+    return { error: "Account created without a session. Turn OFF Confirm Email in Supabase Auth → Providers → Email, then try again." };
+  }
+
   await fetchProfiles();
   return {};
 }

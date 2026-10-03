@@ -53,6 +53,11 @@ function Dashboard() {
           <p className="text-sm text-muted-foreground">{dict.greeting}</p>
           <h1 className="text-3xl md:text-4xl font-bold">{user.name}</h1>
           <p className="mt-2 text-muted-foreground">{dict.dashboardSub}</p>
+          {user.city && (
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-card border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+              <MapPin className="size-3.5 text-primary" /> {user.city}{user.pincode ? ` · ${user.pincode}` : ""}
+            </div>
+          )}
         </motion.div>
 
         <LocationPrompt user={user} />

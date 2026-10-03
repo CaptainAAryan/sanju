@@ -8,8 +8,7 @@ import { Logo } from "@/components/Logo";
 import { t } from "@/lib/i18n";
 import { useUser, useAuthReady, useHasSession, updateActiveLocale } from "@/lib/user-store";
 import { TOPICS } from "@/lib/topics";
-import { COUNTRIES, getCountry } from "@/lib/countries";
-import { lookupPostal } from "@/lib/postal";
+
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -55,7 +54,7 @@ function Dashboard() {
           <p className="mt-2 text-muted-foreground">{dict.dashboardSub}</p>
           {user.city && (
             <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-card border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground">
-              <MapPin className="size-3.5 text-primary" /> {user.city}{user.pincode ? ` · ${user.pincode}` : ""}
+              <MapPin className="size-3.5 text-primary" /> {user.city}
             </div>
           )}
         </motion.div>
@@ -141,33 +140,28 @@ function Dashboard() {
 
 const DISMISS_KEY = "sanjeevni.locale-prompt-dismissed.v1";
 
-function LocationPrompt({ user }: { user: { id: string; country: string; pincode: string | null; city: string | null } }) {
+function LocationPrompt({ user }: { user: { id: string; country: string; city: string | null } }) {
   const [dismissed, setDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     try { return window.localStorage.getItem(`${DISMISS_KEY}.${user.id}`) === "1"; } catch { return false; }
   });
-  const [code, setCode] = useState(user.country);
-  const [pin, setPin] = useState(user.pincode ?? "");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
   const [busy, setBusy] = useState(false);
-  const country = getCountry(code);
 
-  // Show only if user hasn't entered a pincode yet AND hasn't dismissed
-  if (dismissed || user.pincode) return null;
+  if (dismissed || user.city) return null;
 
   function close() {
     try { window.localStorage.setItem(`${DISMISS_KEY}.${user.id}`, "1"); } catch {}
     setDismissed(true);
   }
+
   async function save() {
+    const c = city.trim();
+    const st = state.trim();
+    if (!c || !st) return;
     setBusy(true);
-    const trimmed = pin.trim();
-    const check = await lookupPostal(code, trimmed);
-    if (!check.ok) {
-      setBusy(false);
-      alert(check.error ?? "Invalid postal code.");
-      return;
-    }
-    await updateActiveLocale({ country: code, pincode: trimmed || null, city: check.city ?? null });
+    await updateActiveLocale({ country: user.country, pincode: null, city: `${c}, ${st}` });
     setBusy(false);
     close();
   }
@@ -182,18 +176,14 @@ function LocationPrompt({ user }: { user: { id: string; country: string; pincode
           <MapPin className="size-5" />
         </div>
         <div className="flex-1">
-          <div className="font-semibold text-sm">Help us localize your guidance</div>
-          <p className="text-xs text-muted-foreground mt-0.5">Confirm your country and (optional) postal code for accurate schemes and emergency numbers.</p>
+          <div className="font-semibold text-sm">Personalise your location</div>
+          <p className="text-xs text-muted-foreground mt-0.5">Enter your city/area and state so we can tailor schemes and nearby health services.</p>
         </div>
       </div>
       <div className="mt-3 grid sm:grid-cols-[1fr_1fr_auto] gap-2">
-        <select value={code} onChange={(e) => setCode(e.target.value)} className="rounded-xl bg-card border border-border px-3 py-2 text-sm">
-          {COUNTRIES.map((c) => (<option key={c.code} value={c.code}>{c.flag} {c.name}</option>))}
-        </select>
-        <input value={pin} onChange={(e) => setPin(e.target.value.replace(/[^a-zA-Z0-9 -]/g, "").slice(0, 12))}
-          placeholder={country.pincodePlaceholder ?? "Postal code (optional)"}
-          className="rounded-xl bg-card border border-border px-3 py-2 text-sm tracking-wider" />
-        <button onClick={save} disabled={busy} className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
+        <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City / area" className="rounded-xl bg-card border border-border px-3 py-2 text-sm" />
+        <input value={state} onChange={(e) => setState(e.target.value)} placeholder="State / region" className="rounded-xl bg-card border border-border px-3 py-2 text-sm" />
+        <button onClick={save} disabled={busy || !city.trim() || !state.trim()} className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
           <Save className="size-3.5" /> {busy ? "Saving…" : "Save"}
         </button>
       </div>

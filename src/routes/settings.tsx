@@ -9,7 +9,6 @@ import {
   updateActiveLang, updateActiveLocale, clearDraft, setDraft, profilesByMobile, MAX_PER_MOBILE,
 } from "@/lib/user-store";
 import { COUNTRIES, getCountry } from "@/lib/countries";
-import { lookupPostal } from "@/lib/postal";
 
 export const Route = createFileRoute("/settings")({
   component: SettingsPage,
@@ -30,7 +29,7 @@ function SettingsPage() {
   if (!user) return null;
   const dict = t[user.lang];
 
-  const sameMobile = profilesByMobile(user.mobile);
+  const sameMobile = user.mobile ? profilesByMobile(user.mobile) : [user];
   const canAddMore = sameMobile.length < MAX_PER_MOBILE;
 
   function changeLang(l: Lang) {
@@ -203,24 +202,22 @@ function Row({ label, value, locked, lockedLabel }: { label: string; value: stri
   );
 }
 
-function CountrySection({ user }: { user: { country: string; pincode: string | null; city: string | null } }) {
+function CountrySection({ user }: { user: { country: string; city: string | null } }) {
   const [code, setCode] = useState(user.country);
-  const [pin, setPin] = useState(user.pincode ?? "");
+  const parts = (user.city ?? "").split(",").map((s) => s.trim());
+  const [city, setCity] = useState(parts[0] ?? "");
+  const [state, setState] = useState(parts.slice(1).join(", ") ?? "");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-  const country = getCountry(code);
 
   async function save() {
+    const c = city.trim();
+    const st = state.trim();
+    if (!c || !st) return setMsg("Enter your city/area and state or region.");
     setBusy(true); setMsg(null);
-    const trimmed = pin.trim();
-    const check = await lookupPostal(code, trimmed);
-    if (!check.ok) {
-      setBusy(false);
-      return setMsg(`Error: ${check.error}`);
-    }
-    const res = await updateActiveLocale({ country: code, pincode: trimmed || null, city: check.city ?? null });
+    const res = await updateActiveLocale({ country: code, pincode: null, city: `${c}, ${st}` });
     setBusy(false);
-    setMsg(res?.error ? `Error: ${res.error}` : check.city ? `Saved · ${check.city}` : "Saved");
+    setMsg(res?.error ? `Error: ${res.error}` : "Location saved");
     setTimeout(() => setMsg(null), 2500);
   }
 
@@ -231,29 +228,21 @@ function CountrySection({ user }: { user: { country: string; pincode: string | n
           <MapPin className="size-5 text-muted-foreground" />
         </div>
         <div className="flex-1">
-          <div className="font-semibold">Country & region</div>
-          <div className="text-xs text-muted-foreground">{country.flag} {country.name} · {country.dialPrefix}{user.city ? ` · ${user.city}` : ""}</div>
+          <div className="font-semibold">Country & location</div>
+          <div className="text-xs text-muted-foreground">{getCountry(code).flag} {getCountry(code).name}{user.city ? ` · ${user.city}` : ""}</div>
         </div>
       </div>
-      <select
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-        className="w-full rounded-2xl bg-muted border border-border focus:border-primary px-4 py-2.5 text-sm outline-none mb-2"
-      >
-        {COUNTRIES.map((c) => (
-          <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.dialPrefix})</option>
-        ))}
+      <select value={code} onChange={(e) => setCode(e.target.value)} className="w-full rounded-2xl bg-muted border border-border focus:border-primary px-4 py-2.5 text-sm outline-none mb-2">
+        {COUNTRIES.map((c) => <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.dialPrefix})</option>)}
       </select>
-      <input
-        value={pin}
-        onChange={(e) => setPin(e.target.value.replace(/[^a-zA-Z0-9 -]/g, "").slice(0, 12))}
-        placeholder={country.pincodePlaceholder ?? country.pincodeLabel}
-        className="w-full rounded-2xl bg-muted border border-border focus:border-primary px-4 py-2.5 text-sm outline-none tracking-wider"
-      />
+      <div className="grid sm:grid-cols-2 gap-2">
+        <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City / area" className="w-full rounded-2xl bg-muted border border-border focus:border-primary px-4 py-2.5 text-sm outline-none" />
+        <input value={state} onChange={(e) => setState(e.target.value)} placeholder="State / region" className="w-full rounded-2xl bg-muted border border-border focus:border-primary px-4 py-2.5 text-sm outline-none" />
+      </div>
       <div className="mt-3 flex items-center justify-between gap-3">
         <span className={`text-xs ${msg?.startsWith("Error") ? "text-destructive" : "text-emerald-600"}`}>{msg}</span>
-        <button onClick={save} disabled={busy} className="inline-flex items-center gap-1.5 rounded-full bg-gradient-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
-          <Save className="size-3.5" /> {busy ? "Saving…" : "Save"}
+        <button onClick={save} disabled={busy || !city.trim() || !state.trim()} className="inline-flex items-center gap-1.5 rounded-full bg-gradient-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
+          <Save className="size-3.5" /> {busy ? "Saving…" : "Save location"}
         </button>
       </div>
     </section>

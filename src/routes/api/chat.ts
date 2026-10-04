@@ -1,4 +1,4 @@
-import { createAiProvider } from "@/lib/ai-gateway.server";
+import { createAiProvider, getAiModel, getGeminiApiKey } from "@/lib/ai-gateway.server";
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 
@@ -26,8 +26,8 @@ function systemPrompt(lang = "en", profile?: Body["profile"]) {
 
 PERSONALITY:
 - Calm, kind, respectful, and practical
-- Practical, never robotic. Never say "I am just an AI" or "I am a language model"
-- Use simple words. Avoid medical jargon. When unavoidable, explain in everyday language
+- Never robotic. Never say "I am just an AI" or "I am a language model"
+- Use simple words. Avoid medical jargon. When unavoidable, explain it in everyday language
 - Start with a direct answer, then give one to three simple steps. Use short sentences.
 
 USER CONTEXT:
@@ -50,7 +50,7 @@ NEVER:
 - Diagnose or prescribe specific medication doses
 - Replace a doctor. Always end serious topics with "please see a doctor"
 - Shame the user for any question
-- Use infantilising pet names such as "beta", "बेटा", "child", "kid", "dear child" — address the user respectfully by name or neutrally, whatever their age
+- Use infantilising pet names such as "beta", "बेटा", "child", "kid", "dear child" — address the user respectfully by name or neutrally
 
 Keep replies under 110 words unless the user asks for detail. Use short paragraphs and bullet points; use emojis only when useful.`;
 }
@@ -59,23 +59,28 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = (await request.json()) as Body;
-        if (!Array.isArray(body.messages)) {
-          return new Response("messages required", { status: 400 });
+        try {
+          const body = (await request.json()) as Body;
+          if (!Array.isArray(body.messages)) return new Response("messages required", { status: 400 });
+
+          const key = getGeminiApiKey();
+          if (!key) {
+            console.error("[chat] Missing Gemini API key");
+            return new Response("AI service is not configured. Add GEMINI_API_KEY to the Vercel server environment.", { status: 503 });
+          }
+
+          const gateway = createAiProvider(key);
+          const result = streamText({
+            model: gateway(getAiModel()),
+            system: systemPrompt(body.lang, body.profile),
+            messages: await convertToModelMessages(body.messages as UIMessage[]),
+          });
+
+          return result.toUIMessageStreamResponse({ originalMessages: body.messages as UIMessage[] });
+        } catch (error) {
+          console.error("[chat] Gemini request failed:", error);
+          return new Response("The AI service could not respond right now. Please try again.", { status: 502 });
         }
-        const key = process.env.AI_API_KEY;
-        if (!key) return new Response("Missing AI_API_KEY", { status: 500 });
-
-        const gateway = createAiProvider(key);
-        const result = streamText({
-          model: gateway(process.env.AI_CHAT_MODEL ?? "gpt-4o-mini"),
-          system: systemPrompt(body.lang, body.profile),
-          messages: await convertToModelMessages(body.messages as UIMessage[]),
-        });
-
-        return result.toUIMessageStreamResponse({
-          originalMessages: body.messages as UIMessage[],
-        });
       },
     },
   },

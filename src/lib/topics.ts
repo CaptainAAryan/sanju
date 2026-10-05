@@ -131,24 +131,6 @@ export const TOPICS: Topic[] = [
     s("Child Development Support","Supporting children","Learn why developmental concerns should be assessed early."),
     s("Community Inclusion","Participation matters","Explore ways families, schools and communities can make participation easier.")
   ]),
-  t("sexual-reproductive-health","🫶","bg-gradient-pregnancy","pregnancy","Sexual & Reproductive Health","Puberty, reproductive awareness, prevention and respectful care",[
-    s("Puberty","Understanding body changes","Learn about common physical and emotional changes during puberty and why timing differs."),
-    s("Reproductive Anatomy","Know your body","Simple, factual information about reproductive anatomy and normal body functions."),
-    s("Healthy Boundaries","Respect and consent","Learn about personal boundaries, respect, consent and seeking help if someone feels unsafe."),
-    s("STI Awareness","Prevention and testing","Learn what STIs are, why testing matters and why diagnosis and treatment belong with healthcare professionals."),
-    s("Fertility Awareness","Understanding fertility","Learn basic fertility concepts and why fertility can be affected by many health factors."),
-    s("Reproductive Healthcare","Finding confidential care","Learn how qualified healthcare professionals can provide respectful reproductive-health support."),
-    s("Myths & Misinformation","Check health claims","Learn how to separate common reproductive-health myths from reliable information.")
-  ]),
-  t("older-adult-health","👵","bg-gradient-schemes","schemes","Older Adult Health","Healthy ageing, medicines, mobility, memory and family support",[
-    s("Healthy Ageing","Staying active and independent","Learn about movement, nutrition, sleep, social connection and regular health checks."),
-    s("Medicine Safety","Keeping medicines organised","Learn why medicine lists, correct instructions and regular reviews matter."),
-    s("Blood Pressure & Diabetes","Long-term health checks","Learn why regular monitoring and professional follow-up can help manage chronic conditions."),
-    s("Fall Prevention","Making homes safer","Explore simple environmental and mobility measures that reduce fall risk."),
-    s("Memory & Cognitive Health","Understanding changes","Learn about normal ageing versus concerning memory or thinking changes."),
-    s("Nutrition in Older Age","Eating for strength","Learn about protein, hydration, fibre and nutrient-rich foods for healthy ageing."),
-    s("Caregiver Support","Supporting families","Learn ways families can organise care, appointments, medicines and emotional support.")
-  ]),
   t("others","➕","bg-gradient-schemes","schemes","Others","Other health questions and topics that do not fit one care area",[
     s("Ask Sanju Anything","Start with your question","Ask Sanju about a health topic and get simple information, possible next steps and guidance on when to seek professional care."),
     s("First Aid Awareness","Basic emergency awareness","Learn general first-aid principles and when to contact emergency services. Sanju is not a substitute for trained emergency care."),

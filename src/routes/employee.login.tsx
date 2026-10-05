@@ -46,7 +46,7 @@ function EmployeeLogin() {
     setErr("");
     setBusy(true);
     const res = mode === "signin"
-      ? await employeeSignIn(email.trim(), pw)
+      ? await employeeSignIn(email.trim(), pw, gatePw)
       : await employeeSignUp(name.trim(), email.trim(), pw, gatePw);
     setBusy(false);
     if (res.error) return setErr(res.error);

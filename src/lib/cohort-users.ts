@@ -42,10 +42,11 @@ const PLACES = ["Jaipur","Kathputli Nagar","Bagru","Chomu","Sanganer","Delhi","A
 const LANGS = ["Hindi","English","Bengali","Marathi","Gujarati","Tamil","Telugu"];
 const CARE = ["Nutrition","Hygiene","Vaccination","Child health","Menstrual health","Maternal care","Emergency help","Government schemes"];
 export const COHORT_REGIONS = [
-  { name: "Jaipur", users: 500 }, { name: "Kathputli Nagar", users: 80 }, { name: "Bagru", users: 18 },
+  { name: "Jaipur", users: 470 }, { name: "Kathputli Nagar", users: 80 }, { name: "Bagru", users: 18 },
   { name: "Chomu", users: 15 }, { name: "Sanganer", users: 12 }, { name: "Delhi", users: 8 },
-  { name: "Alwar", users: 5 }, { name: "Dausa", users: 3 }, { name: "Sikar", users: 3 },
-  { name: "Tonk", users: 2 }, { name: "Kota", users: 2 },
+  { name: "Kolkata", users: 15 }, { name: "Mumbai", users: 10 }, { name: "Ahmedabad", users: 8 },
+  { name: "Hyderabad", users: 7 }, { name: "Chennai", users: 5 }, { name: "Alwar", users: 5 },
+  { name: "Dausa", users: 3 },
 ];
 export const COHORT_LANGUAGES = [
   { name: "Hindi", users: 362 }, { name: "English", users: 76 }, { name: "Bengali", users: 142 },
@@ -60,9 +61,9 @@ export const COHORT_GENDER = [
   { name: "Female", users: 338 }, { name: "Male", users: 292 }, { name: "Other / undisclosed", users: 18 },
 ];
 export const COHORT_TOPICS = [
-  { name: "Nutrition", users: 382 }, { name: "Menstrual health", users: 274 }, { name: "Vaccination", users: 221 },
-  { name: "Maternal care", users: 196 }, { name: "Child health", users: 183 }, { name: "Emergency help", users: 166 },
-  { name: "Hygiene", users: 159 }, { name: "Government schemes", users: 131 },
+  { name: "Nutrition", users: 382 }, { name: "Menstrual health", users: 274 }, { name: "Government schemes", users: 250 },
+  { name: "Emergency help", users: 230 }, { name: "Vaccination", users: 221 }, { name: "Maternal care", users: 196 },
+  { name: "Child health", users: 183 }, { name: "Hygiene", users: 159 },
 ];
 export const COHORT_GROWTH = [
   { week: "W1", users: 418 }, { week: "W2", users: 452 }, { week: "W3", users: 489 }, { week: "W4", users: 523 },
@@ -73,8 +74,14 @@ export const COHORT_USERS: CohortUser[] = Array.from({ length: 648 }, (_, i) => 
   const age = 9 + ((i * 17) % 58);
   const first = FIRST_NAMES[(i * 37) % FIRST_NAMES.length];
   const last = LAST_NAMES[(i * 17) % LAST_NAMES.length];
-  const place = i < 500 ? "Jaipur" : i < 580 ? "Kathputli Nagar" : PLACES[2 + ((i - 580) % (PLACES.length - 2))];
   const language = i < 362 ? "Hindi" : i < 438 ? "English" : i < 580 ? "Bengali" : LANGS[(i - 580) % 4 + 3];
+  const place =
+    language === "Tamil" ? "Chennai" :
+    language === "Telugu" ? "Hyderabad" :
+    language === "Gujarati" ? "Ahmedabad" :
+    language === "Marathi" ? "Mumbai" :
+    language === "Bengali" && i % 3 === 0 ? "Kolkata" :
+    i < 500 ? "Jaipur" : i < 580 ? "Kathputli Nagar" : PLACES[2 + ((i - 580) % (PLACES.length - 2))];
   const gender = i % 50 === 0 ? "Other / undisclosed" : i % 2 === 0 ? "Female" : "Male";
   const profiles = 1 + (i % 3);
   const chats = 1 + ((i * 7) % 5);

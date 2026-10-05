@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, BarChart3, Users, Globe2, Languages, MapPin, ShieldCheck, Activity, Database, Eye, UserRound, MessageSquare } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { Logo } from "@/components/Logo";
@@ -40,7 +40,7 @@ function AnalyticsPanel() {
   const { authed, hydrated } = useEmployeeState();
   const [search, setSearch] = useState("");
 
-  useMemo(() => {
+  useEffect(() => {
     if (hydrated && !authed) nav({ to: "/employee/login" });
   }, [hydrated, authed, nav]);
 

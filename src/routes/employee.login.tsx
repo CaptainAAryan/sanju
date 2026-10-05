@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Flower2, Lock, ArrowLeft, Mail, User, Eye, EyeOff } from "lucide-react";
+import { Flower2, Lock, ArrowLeft } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import {
   gateUnlock, gateLock,
@@ -18,11 +18,6 @@ function EmployeeLogin() {
 
   const [gatePw, setGatePw] = useState("");
   const [remember, setRemember] = useState(true);
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [pw, setPw] = useState("");
-  const [show, setShow] = useState(false);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -39,18 +34,6 @@ function EmployeeLogin() {
     } finally {
       setBusy(false);
     }
-  }
-
-  async function submitAuth(e: React.FormEvent) {
-    e.preventDefault();
-    setErr("");
-    setBusy(true);
-    const res = mode === "signin"
-      ? await employeeSignIn(email.trim(), pw, gatePw)
-      : await employeeSignUp(name.trim(), email.trim(), pw, gatePw);
-    setBusy(false);
-    if (res.error) return setErr(res.error);
-    nav({ to: "/employee" });
   }
 
   return (
@@ -104,7 +87,6 @@ function EmployeeLogin() {
               </button>
             </div>
           )}
-)}
         </motion.div>
       </div>
     </PageShell>

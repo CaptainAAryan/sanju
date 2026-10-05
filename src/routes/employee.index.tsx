@@ -126,7 +126,7 @@ function EmployeePanel() {
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-sm truncate">{p.name}</div>
                         <div className="text-[11px] text-muted-foreground flex items-center gap-1">
-                          <Phone className="size-3" /> +91 {p.mobile}
+                          <Phone className="size-3" /> +91 •••••• {String(p.mobile).slice(-4)}
                         </div>
                       </div>
                       {userMsgCount > 0 && (

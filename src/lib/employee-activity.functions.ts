@@ -1,20 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { timingSafeEqual } from "node:crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-
-function validGatePassword(input: string): boolean {
-  const secret = process.env.EMPLOYEE_GATE_PASSWORD;
-  if (!secret || secret.length < 20) return false;
-  const supplied = Buffer.from(input.trim());
-  const expected = Buffer.from(secret);
-  return supplied.length === expected.length && timingSafeEqual(supplied, expected);
-}
+import { verifyEmployeeSession } from "@/lib/employee-claim.functions";
 
 export const getEmployeeUserActivity = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({ gatePassword: z.string().min(1).max(200) }).parse(input))
-  .handler(async ({ data }) => {
-    if (!validGatePassword(data.gatePassword)) throw new Error("Team access required.");
+  .handler(async () => {
+    if (!(await verifyEmployeeSession())) throw new Error("Team access required.");
 
     const users: any[] = [];
     for (let page = 1; page <= 100; page++) {

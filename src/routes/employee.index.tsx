@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, LogOut, MessageSquare, User, Phone, Send, Edit2, Check, X, Languages, Loader2, Users, Activity, Globe2, RefreshCw, Menu } from "lucide-react";
+import { ArrowLeft, LogOut, MessageSquare, User, Phone, Send, Edit2, Check, X, Languages, Loader2, Users, Activity, Globe2, RefreshCw, Menu, BarChart3 } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { Logo } from "@/components/Logo";
 import { employeeLogout, useEmployeeState } from "@/lib/employee-store";
@@ -76,7 +76,7 @@ function EmployeePanel() {
           </div>
         </div>
         <div className="flex items-center gap-1.5">
-          <button onClick={refresh} className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 sm:px-3 py-1.5 text-xs hover:bg-muted">
+          <Link to="/employee/analytics" className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 sm:px-3 py-1.5 text-xs hover:bg-muted"><BarChart3 className="size-3.5" /><span className="hidden sm:inline">Analytics</span></Link>\n          <button onClick={refresh} className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 sm:px-3 py-1.5 text-xs hover:bg-muted">
             <RefreshCw className={`size-3.5 ${refreshing ? "animate-spin" : ""}`} />
             <span className="hidden sm:inline">Refresh</span>
           </button>

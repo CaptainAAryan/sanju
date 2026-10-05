@@ -159,15 +159,15 @@ function AnalyticsPanel() {
 
   const liveAges = useMemo(() => {
     const buckets = [{name:"0–12",users:0},{name:"13–17",users:0},{name:"18–24",users:0},{name:"25–34",users:0},{name:"35–44",users:0},{name:"45–59",users:0},{name:"60+",users:0}];
-    liveProfiles.forEach(p => { const a = ageFromDob(p.dob); if (a === null) return; const i = a<=12?0:a<=17?1:a<=24?2:a<=34?3:a<=44?4:a<=59?5:6; buckets[i].users++; });
+    liveUsers.forEach(p => { const a = ageFromDob(p.dob); if (a === null) return; const i = a<=12?0:a<=17?1:a<=24?2:a<=34?3:a<=44?4:a<=59?5:6; buckets[i].users++; });
     return buckets;
-  }, [liveProfiles]);
+  }, [liveUsers]);
 
   const liveGender = useMemo(() => {
     const counts: Record<string, number> = {"Female":0,"Male":0,"Other / undisclosed":0};
-    liveProfiles.forEach(p => { const k = p.gender === "female" ? "Female" : p.gender === "male" ? "Male" : "Other / undisclosed"; counts[k]++; });
+    liveUsers.forEach(p => { const k = p.gender === "female" ? "Female" : p.gender === "male" ? "Male" : "Other / undisclosed"; counts[k]++; });
     return Object.entries(counts).map(([name, users]) => ({name, users}));
-  }, [liveProfiles]);
+  }, [liveUsers]);
 
   const regions = mode === "demo" ? DEMO_REGIONS : liveRegions;
   const languages = mode === "demo" ? DEMO_LANGUAGES : liveLanguages;

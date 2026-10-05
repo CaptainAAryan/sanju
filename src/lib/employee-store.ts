@@ -139,7 +139,8 @@ export async function employeeLogout() {
 
 const sub = (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb); }; };
 export function useEmployeeState(): State {
-  return useSyncExternalStore(sub, () => state, () => state);
+  const snapshot = useSyncExternalStore(sub, () => state, () => state);
+  return snapshot.gateUnlocked ? { ...snapshot, authed: true, employee: snapshot.employee ?? { id: "team-gate", name: "Sanjeevni Team", email: "" } } : snapshot;
 }
 export function useEmployeeAuth(): boolean {
   return useEmployeeState().authed;

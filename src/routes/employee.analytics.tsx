@@ -52,6 +52,43 @@ const DEMO_TOPICS = [
   { name: "Hygiene", users: 159 }, { name: "Government schemes", users: 131 },
 ];
 
+const DEMO_FIRST_NAMES = ["Aarav","Vivaan","Aditya","Arjun","Kabir","Rohan","Vihaan","Ishaan","Reyansh","Krish","Anaya","Aadhya","Diya","Ira","Myra","Anvi","Sara","Meera","Kavya","Riya","Saanvi","Pihu","Zoya","Tara"];
+const DEMO_LAST_NAMES = ["Sharma","Gupta","Verma","Mehta","Jain","Singh","Khan","Patel","Agarwal","Joshi","Bansal","Malhotra","Choudhary","Saxena","Rathi","Sethi","Kapoor","Mishra"];
+const DEMO_PLACES = ["Jaipur","Kathputli Nagar","Bagru","Chomu","Delhi","Gurugram","Lucknow","Kolkata","Ahmedabad","Mumbai","Pune","Chennai","Hyderabad","Bengaluru","Patna","Bhopal","Jodhpur","Udaipur"];
+const DEMO_LANGS = ["Hindi","English","Bengali","Marathi","Gujarati","Tamil","Telugu"];
+const DEMO_CARE = ["Nutrition","Hygiene","Vaccination","Child health","Menstrual health","Maternal care","Emergency help","Government schemes"];
+
+type DemoUser = {
+  id: string; name: string; age: number; gender: string; place: string; language: string;
+  profiles: number; joined: string; lastActive: string; chats: number; care: string; activity: string;
+};
+
+function buildDemoUsers(): DemoUser[] {
+  return Array.from({ length: 648 }, (_, i) => {
+    const age = 9 + ((i * 17) % 58);
+    const first = DEMO_FIRST_NAMES[i % DEMO_FIRST_NAMES.length];
+    const last = DEMO_LAST_NAMES[(i * 7) % DEMO_LAST_NAMES.length];
+    const place = i < 548 ? "Jaipur" : DEMO_PLACES[i % DEMO_PLACES.length];
+    const language = i < 440 ? "Hindi" : DEMO_LANGS[i % DEMO_LANGS.length];
+    const gender = i % 50 === 0 ? "Other / undisclosed" : i % 2 === 0 ? "Female" : "Male";
+    const profiles = 1 + (i % 3);
+    const chats = 1 + ((i * 11) % 18);
+    const care = DEMO_CARE[(i * 3) % DEMO_CARE.length];
+    const daysAgo = (i * 5) % 31;
+    const joinedDaysAgo = 8 + ((i * 13) % 180);
+    const joined = new Date(Date.now() - joinedDaysAgo * 86400000).toISOString();
+    const lastActive = new Date(Date.now() - daysAgo * 86400000).toISOString();
+    return {
+      id: `demo-${String(i + 1).padStart(4, "0")}`,
+      name: `${first} ${last}`,
+      age, gender, place, language, profiles, joined, lastActive, chats, care,
+      activity: `${care} • ${chats} health chat${chats === 1 ? "" : "s"} • ${profiles} profile${profiles === 1 ? "" : "s"}`,
+    };
+  });
+}
+
+const DEMO_USERS = buildDemoUsers();
+
 const DEMO_GROWTH = [
   { week: "W1", users: 418 }, { week: "W2", users: 452 }, { week: "W3", users: 489 },
   { week: "W4", users: 523 }, { week: "W5", users: 557 }, { week: "W6", users: 593 }, { week: "W7", users: 621 }, { week: "W8", users: 648 },
@@ -90,6 +127,7 @@ function AnalyticsPanel() {
   const [liveUsers, setLiveUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [demoSearch, setDemoSearch] = useState("");
 
   useEffect(() => {
     if (hydrated && !authed) nav({ to: "/employee/login" });
@@ -111,13 +149,13 @@ function AnalyticsPanel() {
     const counts: Record<string, number> = {};
     liveUsers.forEach(p => { const k = p.city || (p.country === "IN" ? "India — location not set" : p.country || "Unknown"); counts[k] = (counts[k] ?? 0) + 1; });
     return Object.entries(counts).map(([name, users]) => ({ name, users })).sort((a,b)=>b.users-a.users).slice(0, 12);
-  }, [liveProfiles]);
+  }, [liveUsers]);
 
   const liveLanguages = useMemo(() => {
     const counts: Record<string, number> = {};
-    liveProfiles.forEach(p => { counts[p.lang] = (counts[p.lang] ?? 0) + 1; });
+    liveUsers.forEach(p => { counts[p.lang] = (counts[p.lang] ?? 0) + 1; });
     return Object.entries(counts).map(([name, users]) => ({ name, users })).sort((a,b)=>b.users-a.users);
-  }, [liveProfiles]);
+  }, [liveUsers]);
 
   const liveAges = useMemo(() => {
     const buckets = [{name:"0–12",users:0},{name:"13–17",users:0},{name:"18–24",users:0},{name:"25–34",users:0},{name:"35–44",users:0},{name:"45–59",users:0},{name:"60+",users:0}];
@@ -169,6 +207,32 @@ function AnalyticsPanel() {
           </div>
         )}
         {error && <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs">{error}</div>}
+
+        {mode === "demo" && (
+          <ChartCard title="648 preloaded demo members" subtitle="Fictional seed records built into the dashboard for demonstrations. These are not real people or real registrations.">
+            <div className="flex flex-col sm:flex-row gap-2 mb-3">
+              <input value={demoSearch} onChange={e => setDemoSearch(e.target.value)} placeholder="Search name, city, language..." className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+              <div className="rounded-xl border border-border px-3 py-2 text-xs font-bold whitespace-nowrap">{DEMO_USERS.length.toLocaleString()} seeded users</div>
+            </div>
+            <div className="overflow-x-auto max-h-[620px] overflow-y-auto rounded-xl border border-border">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-card">
+                  <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                    <th className="p-3">#</th><th className="p-3">Name</th><th className="p-3">Age</th><th className="p-3">Gender</th><th className="p-3">Place</th><th className="p-3">Language</th><th className="p-3">Profiles</th><th className="p-3">Chats</th><th className="p-3">Last active</th><th className="p-3">Activity</th>
+                  </tr>
+                </thead>
+                <tbody>{DEMO_USERS.filter(u => {
+                  const q = demoSearch.trim().toLowerCase();
+                  return !q || [u.name,u.place,u.language,u.care,u.activity].some(v => v.toLowerCase().includes(q));
+                }).map((u, i) => (
+                  <tr key={u.id} className="border-b border-border/60 hover:bg-muted/40">
+                    <td className="p-3 text-muted-foreground">{i + 1}</td><td className="p-3 font-semibold">{u.name}</td><td className="p-3">{u.age}</td><td className="p-3">{u.gender}</td><td className="p-3">{u.place}</td><td className="p-3">{u.language}</td><td className="p-3">{u.profiles}</td><td className="p-3">{u.chats}</td><td className="p-3 whitespace-nowrap">{new Date(u.lastActive).toLocaleDateString()}</td><td className="p-3">{u.activity}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+          </ChartCard>
+        )}
 
         {mode === "live" && (
           <ChartCard title="Real user activity" subtitle="Persistent Supabase account records. Last sign-in and onboarding profile data are shown for each account.">

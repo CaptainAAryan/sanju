@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Shield, Heart, Globe, Mic, MessageCircle, LogIn, UserPlus, Settings } from "lucide-react";
+import { ArrowRight, Sparkles, Shield, Heart, Globe, Mic, MessageCircle, LogIn, UserPlus, Settings, HeartHandshake } from "lucide-react";
 import { Logo, LogoFull } from "@/components/Logo";
 import { PageShell, Disclaimer } from "@/components/PageShell";
 import { EmergencyBar } from "@/components/EmergencyBar";
@@ -36,7 +36,7 @@ function Landing() {
           <a href="#features" className="hover:text-foreground transition">Features</a>
           <a href="#topics" className="hover:text-foreground transition">Topics</a>
           <a href="#impact" className="hover:text-foreground transition">Impact</a>
-          <a href="#mission" className="hover:text-foreground transition">Mission</a>
+          <Link to="/mission" className="hover:text-foreground transition">Our Mission</Link>
         </nav>
         <div className="flex items-center gap-2">
           {loggedIn ? (
@@ -198,7 +198,7 @@ function Landing() {
       {/* Topics */}
       <section id="topics" className="mx-auto max-w-6xl px-5 py-12">
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold">Topics that matter</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">15 care areas</h2>
           <p className="mt-2 text-muted-foreground">From first period to first vaccine — guidance you can trust.</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -214,14 +214,24 @@ function Landing() {
                 <div className={`absolute inset-0 ${topic.gradient}`} />
                 <div className="relative">
                   <div className="text-3xl">{topic.icon}</div>
-                  <h3 className="mt-3 font-bold leading-tight">{ti.title}</h3>
-                  <p className="mt-1 text-xs text-white/80 leading-snug">{ti.desc}</p>
+                  <h3 className="mt-3 font-bold leading-tight">{topic.title}</h3>
+                  <p className="mt-1 text-xs text-white/80 leading-snug">{topic.desc}</p>
                   <ArrowRight className="size-4 mt-3 opacity-70 group-hover:translate-x-1 transition" />
                 </div>
               </Link>
             );
           })}
         </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-4">
+        <Link to="/mission" className="block rounded-3xl bg-gradient-soft border border-primary/20 p-6 hover:border-primary/40 transition">
+          <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
+            <div className="size-14 rounded-2xl bg-gradient-primary grid place-items-center text-primary-foreground"><HeartHandshake className="size-6" /></div>
+            <div className="flex-1"><div className="text-xs uppercase tracking-widest text-primary font-bold">Our Mission</div><div className="mt-1 text-lg font-bold">Make basic health and hygiene knowledge accessible to everyone.</div><p className="mt-1 text-sm text-muted-foreground">We use responsible AI to make health information easier to understand, multilingual and easier to access.</p></div>
+            <ArrowRight className="size-5 text-primary" />
+          </div>
+        </Link>
       </section>
 
       {/* Impact */}

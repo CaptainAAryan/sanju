@@ -19,7 +19,7 @@ const FIRST_NAMES = [
   "Amit","Sumit","Ravi","Manoj","Vijay","Ajay","Deepak","Pawan","Prakash","Sunil","Anil","Vinod","Ashok",
   "Rakesh","Santosh","Kailash","Babu","Madan","Shyam","Ram","Mangal","Dharam","Jitendra","Narendra","Dev",
   "Karan","Rohit","Nitin","Sachin","Vikas","Akash","Aakash","Rahul","Vishal","Aman","Arvind","Lokesh",
-  "Sanjay","Sanjay Kumar","Raj","Chotu","Guddu","Bittu","Sonu Kumar","Monu","Munni","Pooja","Sita","Geeta",
+  "Sanjay","Sanjay Kumar","Manish","Manish Kumar","Raj","Chotu","Guddu","Bittu","Sonu Kumar","Monu","Munni","Pooja","Sita","Geeta",
   "Rekha","Sunita","Kamla","Shanti","Meena","Neelam","Usha","Asha","Maya","Kiran","Babita","Savita",
   "Anita","Rani","Rinku","Seema","Mamta","Kavita","Laxmi","Lakshmi","Radha","Suman","Pushpa","Shobha",
   "Renu","Nisha","Priya","Ritu","Neha","Jyoti","Komal","Roshni","Parvati","Gudiya","Chanda","Muskan",
@@ -34,20 +34,21 @@ const LAST_NAMES = [
   "Hussain","Begum","Parveen","Bano","Khatun","Verma","Kushwah","Kushwaha","Pal","Rao","Goyal","Bansal",
   "Gupta","Singh","Jain","Patel","Mishra","Tiwari","Dubey","Sah","Das","Roy","Mondal","Sarkar","Nath",
   "Biswas","Paul","Dutta","Ghosh","Khanam","Mandal","Naik","Jadhav","Pawar","Shinde","More","Gaikwad",
-  "Kamble","Wagh","Patil","Reddy","Rao","Naidu","Kumar","Chauhan","Thakur","Soni","Soniya","Joshi",
+  "Kamble","Wagh","Patil","Reddy","Rao","Maloo","Naidu","Kumar","Chauhan","Thakur","Soni","Soniya","Joshi",
   "Bishnoi","Bishnoi","Dangi","Bajpai","Srivastav","Srivastava","Tripathi","Shukla","Gupta Ji","Begum"
 ];
 
-const PLACES = ["Jaipur","Kathputli Nagar","Bagru","Chomu","Sanganer","Vishwakarma Industrial Area","Ramganj","Murlipura","Jhotwara","Amer","Bassi","Jobner","Delhi","Alwar","Dausa","Sikar","Tonk","Kota","Ajmer","Bharatpur","Jodhpur","Udaipur","Kolkata","Ahmedabad","Mumbai","Pune","Patna","Lucknow","Bhopal"];
+const PLACES = ["Jaipur","Kathputli Nagar","Bagru","Chomu","Sanganer","Delhi","Alwar","Dausa","Sikar","Tonk","Kota"];
 const LANGS = ["Hindi","English","Bengali","Marathi","Gujarati","Tamil","Telugu"];
 const CARE = ["Nutrition","Hygiene","Vaccination","Child health","Menstrual health","Maternal care","Emergency help","Government schemes"];
 export const COHORT_REGIONS = [
-  { name: "Jaipur", users: 548 }, { name: "Kathputli Nagar", users: 22 }, { name: "Bagru", users: 18 },
-  { name: "Chomu", users: 15 }, { name: "North India", users: 12 }, { name: "West India", users: 14 },
-  { name: "East India", users: 8 }, { name: "South India", users: 7 }, { name: "North-East India", users: 4 },
+  { name: "Jaipur", users: 500 }, { name: "Kathputli Nagar", users: 80 }, { name: "Bagru", users: 18 },
+  { name: "Chomu", users: 15 }, { name: "Sanganer", users: 12 }, { name: "Delhi", users: 8 },
+  { name: "Alwar", users: 5 }, { name: "Dausa", users: 3 }, { name: "Sikar", users: 3 },
+  { name: "Tonk", users: 2 }, { name: "Kota", users: 2 },
 ];
 export const COHORT_LANGUAGES = [
-  { name: "Hindi", users: 440 }, { name: "English", users: 98 }, { name: "Bengali", users: 42 },
+  { name: "Hindi", users: 362 }, { name: "English", users: 76 }, { name: "Bengali", users: 142 },
   { name: "Marathi", users: 25 }, { name: "Gujarati", users: 18 }, { name: "Tamil", users: 12 },
   { name: "Telugu", users: 8 }, { name: "Other", users: 5 },
 ];
@@ -72,11 +73,11 @@ export const COHORT_USERS: CohortUser[] = Array.from({ length: 648 }, (_, i) => 
   const age = 9 + ((i * 17) % 58);
   const first = FIRST_NAMES[(i * 37) % FIRST_NAMES.length];
   const last = LAST_NAMES[(i * 17) % LAST_NAMES.length];
-  const place = i < 548 ? PLACES[i % 12] : PLACES[(i * 11) % PLACES.length];
-  const language = i < 440 ? "Hindi" : LANGS[i % LANGS.length];
+  const place = i < 500 ? "Jaipur" : i < 580 ? "Kathputli Nagar" : PLACES[2 + ((i - 580) % (PLACES.length - 2))];
+  const language = i < 362 ? "Hindi" : i < 438 ? "English" : i < 580 ? "Bengali" : LANGS[(i - 580) % 4 + 3];
   const gender = i % 50 === 0 ? "Other / undisclosed" : i % 2 === 0 ? "Female" : "Male";
   const profiles = 1 + (i % 3);
-  const chats = 1 + ((i * 11) % 18);
+  const chats = 1 + ((i * 7) % 5);
   const care = CARE[(i * 3) % CARE.length];
   const daysAgo = (i * 5) % 31;
   const joinedDaysAgo = 8 + ((i * 13) % 180);
@@ -90,3 +91,5 @@ export const COHORT_USERS: CohortUser[] = Array.from({ length: 648 }, (_, i) => 
     mobile: `98${String(10000000 + i * 137).slice(-8)}`,
   };
 });
+
+export const COHORT_LEADERBOARD = COHORT_USERS.slice().sort((a,b) => b.chats - a.chats).slice(0, 10).map((u, i) => ({ rank: i + 1, name: u.name, chats: u.chats, place: u.place, language: u.language }));

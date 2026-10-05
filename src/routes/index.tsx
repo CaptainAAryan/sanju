@@ -12,9 +12,9 @@ import { useHasMounted, useUser, clearDraft } from "@/lib/user-store";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sanjeevni Saheli AI — Healthcare for every Indian family" },
+      { title: "Project Sanjeevni — Jeevan Ko Nayi Chetna" },
       { name: "description", content: "Warm, multilingual AI health companion. Guidance on menstrual health, nutrition, pregnancy, vaccination & emergencies. Hindi · Bengali · English." },
-      { property: "og:title", content: "Sanjeevni Saheli AI — Healthcare for every Indian family" },
+      { property: "og:title", content: "Project Sanjeevni — Jeevan Ko Nayi Chetna" },
       { property: "og:description", content: "Warm, multilingual AI health companion for India." },
     ],
   }),
@@ -239,7 +239,7 @@ function Landing() {
         <div className="rounded-3xl bg-gradient-primary p-8 md:p-12 text-primary-foreground shadow-glow text-center">
           <h2 className="text-3xl md:text-4xl font-bold">Healthcare access, reimagined</h2>
           <p className="mt-3 text-primary-foreground/85 max-w-2xl mx-auto">
-            India has 1.4 billion people and just 1 doctor per 1,500. Sanjeevni Saheli AI bridges that gap with trustworthy, vernacular guidance — anywhere, anytime.
+            India has 1.4 billion people and just 1 doctor per 1,500. Project Sanjeevni helps bridge that gap with trustworthy, vernacular guidance — anywhere, anytime.
           </p>
           <div className="mt-8 grid grid-cols-3 gap-4 text-center">
             {[
@@ -264,7 +264,7 @@ function Landing() {
             <div className="text-xs uppercase tracking-widest text-primary font-bold">Our Mission</div>
             <h3 className="mt-1 text-2xl font-bold">A student-led initiative for a healthier India</h3>
             <p className="mt-2 text-muted-foreground text-sm max-w-2xl">
-              Sanjeevni Saheli AI is built as a non-profit, open-access health companion. Our mission: empower every woman, mother and family with the right health information, in their own language.
+              Project Sanjeevni is a non-profit, open-access health companion. Our mission: empower every woman, mother and family with the right health information, in their own language.
             </p>
           </div>
           <Link

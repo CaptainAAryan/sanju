@@ -42,7 +42,7 @@ const PLACES = ["Jaipur","Kathputli Nagar","Bagru","Chomu","Sanganer","Delhi","A
 const LANGS = ["Hindi","English","Bengali","Marathi","Gujarati","Tamil","Telugu"];
 const CARE = ["Nutrition","Hygiene","Vaccination","Child health","Menstrual health","Maternal care","Emergency help","Government schemes"];
 export const COHORT_REGIONS = [
-  { name: "Jaipur", users: 470 }, { name: "Kathputli Nagar", users: 80 }, { name: "Bagru", users: 18 },
+  { name: "Jaipur", users: 462 }, { name: "Kathputli Nagar", users: 80 }, { name: "Bagru", users: 18 },
   { name: "Chomu", users: 15 }, { name: "Sanganer", users: 12 }, { name: "Delhi", users: 8 },
   { name: "Kolkata", users: 15 }, { name: "Mumbai", users: 10 }, { name: "Ahmedabad", users: 8 },
   { name: "Hyderabad", users: 7 }, { name: "Chennai", users: 5 }, { name: "Alwar", users: 5 },

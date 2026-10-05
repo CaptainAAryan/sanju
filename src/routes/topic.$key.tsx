@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ChevronDown, MessageCircle, Search } from "lucide-react";
 import { PageShell, Disclaimer } from "@/components/PageShell";
-import { t, type TopicKey } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 import { useUser, useAuthReady, useHasSession } from "@/lib/user-store";
 import { TOPICS } from "@/lib/topics";
 
@@ -46,8 +46,8 @@ function TopicPage() {
           <div className="mt-6 flex items-center gap-4">
             <div className="text-5xl">{topic.icon}</div>
             <div>
-              <h1 className="text-3xl font-bold">{ti.title}</h1>
-              <p className="text-white/80 mt-1">{ti.desc}</p>
+              <h1 className="text-3xl font-bold">{topic.title}</h1>
+              <p className="text-white/80 mt-1">{topic.desc}</p>
             </div>
           </div>
         </div>

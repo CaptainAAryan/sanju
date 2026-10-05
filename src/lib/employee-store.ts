@@ -83,10 +83,24 @@ export function gateLock() {
   set({ gateUnlocked: false });
 }
 
-export async function employeeSignIn(email: string, password: string): Promise<{ error?: string }> {
+export async function employeeSignIn(email: string, password: string, gatePassword: string): Promise<{ error?: string }> {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: "Invalid email or password." };
+
   await refreshEmployee();
+  if (!state.authed && gatePassword) {
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData.user;
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (user && token) {
+      const { claimEmployeeRole } = await import("@/lib/employee-claim.functions");
+      const name = String(user.user_metadata?.name ?? user.email?.split("@")[0] ?? "Sanjeevni Team");
+      const res = await claimEmployeeRole({ data: { name, gatePassword, accessToken: token } });
+      if (!res?.ok) return { error: res?.error ?? "Could not register as employee." };
+      await refreshEmployee();
+    }
+  }
   if (!state.authed) return { error: "This account is not an employee account." };
   return {};
 }

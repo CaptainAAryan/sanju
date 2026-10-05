@@ -117,7 +117,6 @@ function Dashboard() {
         </div>
         <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {TOPICS.map((topic, i) => {
-            const ti = dict.topics[topic.key];
             return (
               <motion.div
                 key={topic.key}

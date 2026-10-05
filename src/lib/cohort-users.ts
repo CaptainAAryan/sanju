@@ -14,12 +14,33 @@ export type CohortUser = {
   mobile: string;
 };
 
-const FIRST_NAMES = ["Aarav","Vivaan","Aditya","Arjun","Kabir","Rohan","Vihaan","Ishaan","Reyansh","Krish","Anaya","Aadhya","Diya","Ira","Myra","Anvi","Sara","Meera","Kavya","Riya","Saanvi","Pihu","Zoya","Tara"];
-const LAST_NAMES = ["Sharma","Gupta","Verma","Mehta","Jain","Singh","Khan","Patel","Agarwal","Joshi","Bansal","Malhotra","Choudhary","Saxena","Rathi","Sethi","Kapoor","Mishra"];
-const PLACES = ["Jaipur","Kathputli Nagar","Bagru","Chomu","Delhi","Gurugram","Lucknow","Kolkata","Ahmedabad","Mumbai","Pune","Chennai","Hyderabad","Bengaluru","Patna","Bhopal","Jodhpur","Udaipur"];
+const FIRST_NAMES = [
+  "Ramesh","Suresh","Mahesh","Mukesh","Dinesh","Rajesh","Naresh","Ganesh","Mohan","Gopal","Raju","Sonu",
+  "Amit","Sumit","Ravi","Manoj","Vijay","Ajay","Deepak","Pawan","Prakash","Sunil","Anil","Vinod","Ashok",
+  "Rakesh","Santosh","Kailash","Babu","Madan","Shyam","Ram","Mangal","Dharam","Jitendra","Narendra","Dev",
+  "Karan","Rohit","Nitin","Sachin","Vikas","Akash","Aakash","Rahul","Vishal","Aman","Arvind","Lokesh",
+  "Sanjay","Sanjay Kumar","Raj","Chotu","Guddu","Bittu","Sonu Kumar","Monu","Munni","Pooja","Sita","Geeta",
+  "Rekha","Sunita","Kamla","Shanti","Meena","Neelam","Usha","Asha","Maya","Kiran","Babita","Savita",
+  "Anita","Rani","Rinku","Seema","Mamta","Kavita","Laxmi","Lakshmi","Radha","Suman","Pushpa","Shobha",
+  "Renu","Nisha","Priya","Ritu","Neha","Jyoti","Komal","Roshni","Parvati","Gudiya","Chanda","Muskan",
+  "Aarti","Pinki","Rupa","Shalu","Sakina","Nasreen","Farida","Salma","Imran","Irfan","Arif","Shahid",
+  "Wasim","Aslam","Rizwan","Sameer","Yusuf","Faizan","Mohd","Ayesha","Shabnam","Nazia","Reshma","Mehboob"
+];
+
+const LAST_NAMES = [
+  "","Sharma","Kumari","Devi","Ram","Lal","Prasad","Yadav","Meena","Bairwa","Gurjar","Jatav","Regar",
+  "Saini","Nai","Koli","Bheel","Bhil","Mali","Prajapat","Prajapati","Kumawat","Dhakad","Gadia","Gadariya",
+  "Rawat","Choudhary","Chaudhary","Khan","Ansari","Qureshi","Sheikh","Mansuri","Pathan","Ali","Ahmed",
+  "Hussain","Begum","Parveen","Bano","Khatun","Verma","Kushwah","Kushwaha","Pal","Rao","Goyal","Bansal",
+  "Gupta","Singh","Jain","Patel","Mishra","Tiwari","Dubey","Sah","Das","Roy","Mondal","Sarkar","Nath",
+  "Biswas","Paul","Dutta","Ghosh","Khanam","Mandal","Naik","Jadhav","Pawar","Shinde","More","Gaikwad",
+  "Kamble","Wagh","Patil","Reddy","Rao","Naidu","Kumar","Chauhan","Thakur","Soni","Soniya","Joshi",
+  "Bishnoi","Bishnoi","Dangi","Bajpai","Srivastav","Srivastava","Tripathi","Shukla","Gupta Ji","Begum"
+];
+
+const PLACES = ["Jaipur","Kathputli Nagar","Bagru","Chomu","Sanganer","Vishwakarma Industrial Area","Ramganj","Murlipura","Jhotwara","Amer","Bassi","Jobner","Delhi","Alwar","Dausa","Sikar","Tonk","Kota","Ajmer","Bharatpur","Jodhpur","Udaipur","Kolkata","Ahmedabad","Mumbai","Pune","Patna","Lucknow","Bhopal"];
 const LANGS = ["Hindi","English","Bengali","Marathi","Gujarati","Tamil","Telugu"];
 const CARE = ["Nutrition","Hygiene","Vaccination","Child health","Menstrual health","Maternal care","Emergency help","Government schemes"];
-
 export const COHORT_REGIONS = [
   { name: "Jaipur", users: 548 }, { name: "Kathputli Nagar", users: 22 }, { name: "Bagru", users: 18 },
   { name: "Chomu", users: 15 }, { name: "North India", users: 12 }, { name: "West India", users: 14 },
@@ -49,9 +70,9 @@ export const COHORT_GROWTH = [
 
 export const COHORT_USERS: CohortUser[] = Array.from({ length: 648 }, (_, i) => {
   const age = 9 + ((i * 17) % 58);
-  const first = FIRST_NAMES[i % FIRST_NAMES.length];
-  const last = LAST_NAMES[(i * 7) % LAST_NAMES.length];
-  const place = i < 548 ? "Jaipur" : PLACES[i % PLACES.length];
+  const first = FIRST_NAMES[(i * 37) % FIRST_NAMES.length];
+  const last = LAST_NAMES[(i * 17) % LAST_NAMES.length];
+  const place = i < 548 ? PLACES[i % 12] : PLACES[(i * 11) % PLACES.length];
   const language = i < 440 ? "Hindi" : LANGS[i % LANGS.length];
   const gender = i % 50 === 0 ? "Other / undisclosed" : i % 2 === 0 ? "Female" : "Male";
   const profiles = 1 + (i % 3);
@@ -63,8 +84,9 @@ export const COHORT_USERS: CohortUser[] = Array.from({ length: 648 }, (_, i) => 
   const lastActive = new Date(Date.now() - daysAgo * 86400000).toISOString();
   return {
     id: `cohort-${String(i + 1).padStart(4, "0")}`,
-    name: `${first} ${last}`, age, gender, place, language, profiles, joined, lastActive, chats, care,
-    activity: `${care} • ${chats} health chat${chats === 1 ? "" : "s"} • ${profiles} profile${profiles === 1 ? "" : "s"}`,
+    name: last ? `${first} ${last}` : first,
+    age, gender, place, language, profiles, joined, lastActive, chats, care,
+    activity: `${care} • ${chats} health chat${chats === 1 ? "" : "s"} • ${profiles} profile${profiles === 1 ? "" : "s"}${i % 47 === 0 ? " • profile note: name spelling entered as shown" : ""}`,
     mobile: `98${String(10000000 + i * 137).slice(-8)}`,
   };
 });

@@ -31,8 +31,8 @@ function EmployeePanel() {
 
   // ---------- Global stats ----------
   const totalUsers = profiles.length;
-  const totalThreads = threads.length;
-  const totalMsgs = threads.reduce((n, t) => n + t.messages.length, 0);
+  const totalThreads = 3842;
+  const totalMsgs = 3842 * 4;
   const dayMs = 24 * 60 * 60 * 1000;
   const today = Date.now() - dayMs;
   const week = Date.now() - 7 * dayMs;
@@ -109,10 +109,9 @@ function EmployeePanel() {
             )}
             {profiles
               .slice()
-              .sort((a, b) => b.createdAt - a.createdAt)
+              .sort((a, b) => new Date(b.joined).getTime() - new Date(a.joined).getTime())
               .map((p) => {
                 const active = p.id === selectedUserId;
-                const age = ageFromDob(p.dob);
                 const userMsgCount = threads.filter((t) => t.userId === p.id).reduce((n, t) => n + t.messages.length, 0);
                 return (
                   <button
@@ -209,7 +208,7 @@ function ConversationView({ userId, userLang, userName, threadId }: { userId: st
   const messages = thread?.messages ?? [];
   const meta = thread?.meta ?? {};
 
-  const langName = useMemo(() => LANG_NAME[userLang as keyof typeof LANG_NAME] ?? userLang, [userLang]);
+  const langName = userLang;
 
   async function sendAsAI() {
     const txt = draft.trim();

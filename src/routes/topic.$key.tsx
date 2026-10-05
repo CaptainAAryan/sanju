@@ -20,8 +20,7 @@ function TopicPage() {
   const [open, setOpen] = useState<number | null>(0);
   const [q, setQ] = useState("");
 
-  const topicKey = key as TopicKey;
-  const topic = TOPICS.find((tp) => tp.key === topicKey);
+  const topic = TOPICS.find((tp) => tp.key === key);
 
   useEffect(() => {
     if (!topic) nav({ to: "/dashboard" });
@@ -30,9 +29,8 @@ function TopicPage() {
 
   if (!topic || !user) return null;
 
-  const dict = t[user.lang];
-  const ti = dict.topics[topicKey];
-  const subs = dict.subtopics[topicKey].filter(
+  const dict = t[user.lang] ?? t.en;
+  const subs = topic.subtopics.filter(
     (s) => !q || (s.title + s.preview + s.detail).toLowerCase().includes(q.toLowerCase()),
   );
 

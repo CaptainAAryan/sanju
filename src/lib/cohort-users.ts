@@ -66,8 +66,11 @@ export const COHORT_TOPICS = [
   { name: "Child health", users: 183 }, { name: "Hygiene", users: 159 },
 ];
 export const COHORT_GROWTH = [
-  { week: "W1", users: 418 }, { week: "W2", users: 452 }, { week: "W3", users: 489 }, { week: "W4", users: 523 },
-  { week: "W5", users: 557 }, { week: "W6", users: 593 }, { week: "W7", users: 621 }, { week: "W8", users: 648 },
+  { week: "W1", users: 11 }, { week: "W2", users: 29 }, { week: "W3", users: 50 }, { week: "W4", users: 74 },
+  { week: "W5", users: 100 }, { week: "W6", users: 120 }, { week: "W7", users: 143 }, { week: "W8", users: 170 },
+  { week: "W9", users: 200 }, { week: "W10", users: 230 }, { week: "W11", users: 265 }, { week: "W12", users: 305 },
+  { week: "W13", users: 350 }, { week: "W14", users: 400 }, { week: "W15", users: 455 }, { week: "W16", users: 515 },
+  { week: "W17", users: 580 }, { week: "W18", users: 648 },
 ];
 
 export const COHORT_USERS: CohortUser[] = Array.from({ length: 648 }, (_, i) => {

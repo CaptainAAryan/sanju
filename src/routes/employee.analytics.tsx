@@ -7,7 +7,7 @@ import {
 import { PageShell } from "@/components/PageShell";
 import { Logo } from "@/components/Logo";
 import { useEmployeeState } from "@/lib/employee-store";
-import { getEmployeeDemographics } from "@/lib/employee-demographics.functions";
+import { getEmployeeUserActivity } from "@/lib/employee-activity.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { ageFromDob, type UserProfile } from "@/lib/user-store";
 import {
@@ -87,7 +87,7 @@ function AnalyticsPanel() {
   const nav = useNavigate();
   const { authed, hydrated } = useEmployeeState();
   const [mode, setMode] = useState<"demo" | "live">("demo");
-  const [liveProfiles, setLiveProfiles] = useState<UserProfile[]>([]);
+  const [liveUsers, setLiveUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -98,20 +98,18 @@ function AnalyticsPanel() {
   async function loadLive() {
     setLoading(true); setError("");
     try {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) throw new Error("Please sign in again.");
-      const rows = await getEmployeeDemographics({ data: { accessToken: data.session.access_token } });
-      setLiveProfiles(rows as UserProfile[]);
+      const rows = await getEmployeeUserActivity();
+      setLiveUsers(rows as any[]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load live demographics.");
     } finally { setLoading(false); }
   }
 
-  useEffect(() => { if (mode === "live" && authed && liveProfiles.length === 0) void loadLive(); }, [mode, authed]);
+  useEffect(() => { if (mode === "live" && authed && liveUsers.length === 0) void loadLive(); }, [mode, authed]);
 
   const liveRegions = useMemo(() => {
     const counts: Record<string, number> = {};
-    liveProfiles.forEach(p => { const k = p.city || (p.country === "IN" ? "India — location not set" : p.country || "Unknown"); counts[k] = (counts[k] ?? 0) + 1; });
+    liveUsers.forEach(p => { const k = p.city || (p.country === "IN" ? "India — location not set" : p.country || "Unknown"); counts[k] = (counts[k] ?? 0) + 1; });
     return Object.entries(counts).map(([name, users]) => ({ name, users })).sort((a,b)=>b.users-a.users).slice(0, 12);
   }, [liveProfiles]);
 
@@ -137,7 +135,7 @@ function AnalyticsPanel() {
   const languages = mode === "demo" ? DEMO_LANGUAGES : liveLanguages;
   const ages = mode === "demo" ? DEMO_AGES : liveAges;
   const gender = mode === "demo" ? DEMO_GENDER : liveGender;
-  const total = mode === "demo" ? 648 : liveProfiles.length;
+  const total = mode === "demo" ? 648 : liveUsers.length;
 
   if (!authed) return null;
 
@@ -171,6 +169,27 @@ function AnalyticsPanel() {
           </div>
         )}
         {error && <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs">{error}</div>}
+
+        {mode === "live" && (
+          <ChartCard title="Real user activity" subtitle="Persistent Supabase account records. Last sign-in and onboarding profile data are shown for each account.">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead><tr className="border-b border-border text-left text-xs text-muted-foreground">
+                  <th className="py-2 pr-4">Name</th><th className="py-2 pr-4">Location</th><th className="py-2 pr-4">Language</th><th className="py-2 pr-4">Profiles</th><th className="py-2">Last sign-in</th>
+                </tr></thead>
+                <tbody>{liveUsers.map((u) => (
+                  <tr key={u.id} className="border-b border-border/60">
+                    <td className="py-3 pr-4 font-semibold">{u.name}</td>
+                    <td className="py-3 pr-4">{u.city || u.country || "—"}</td>
+                    <td className="py-3 pr-4">{u.lang || "—"}</td>
+                    <td className="py-3 pr-4">{u.profileCount}</td>
+                    <td className="py-3">{u.lastSignInAt ? new Date(u.lastSignInAt).toLocaleString() : "Never"}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+          </ChartCard>
+        )}
 
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <Metric icon={<Users />} label="Registered users" value={total.toLocaleString()} sub={mode==="demo" ? "demo cohort" : "live profiles"} />

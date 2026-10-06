@@ -60,6 +60,14 @@ export const TOPICS: Topic[] = [
     s("Allergies","Understanding allergic symptoms","Learn about common triggers and why breathing difficulty or severe swelling needs urgent help."),
     s("When to See a Doctor","Knowing when symptoms matter","Learn how severity, duration, worsening symptoms and warning signs guide decisions about professional care.")
   ]),
+  t("schemes","🏛️","bg-gradient-schemes","schemes","Government Schemes","Central, state and local health, nutrition and welfare schemes",[
+    s("National Health Schemes","Government health support","Learn about major public health programmes, who they are for, and where to ask for help."),
+    s("Maternity & Women’s Schemes","Support for women and families","Learn about public maternity, nutrition and women’s welfare support and how eligibility is checked."),
+    s("Child & Nutrition Schemes","Support for children","Learn about public nutrition, child-health and immunisation programmes and where to apply or ask."),
+    s("State & Local Schemes","Support near you","Learn how state, district and municipal programmes can provide health and welfare support."),
+    s("How to Apply","Documents and eligibility","Understand common eligibility checks, documents and official places to verify a scheme."),
+    s("Avoiding Scams","Use official channels","Learn how to verify government schemes and avoid sharing money or sensitive information with unofficial agents.")
+  ]),
   t("mental-wellbeing","🧠","bg-gradient-schemes","schemes","Mental Wellbeing","Stress, sleep, emotions, resilience and finding support",[
     s("Stress","Understanding everyday stress","Learn what stress can feel like, how routines and support can help, and when ongoing stress needs support."),
     s("Sleep","Healthier sleep habits","Explore regular routines, screen habits, relaxation and when persistent sleep problems need attention."),

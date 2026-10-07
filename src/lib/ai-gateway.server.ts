@@ -1,6 +1,7 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/";
+const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
 
 export function getGeminiApiKey() {
   return (
@@ -12,13 +13,21 @@ export function getGeminiApiKey() {
 }
 
 export function createAiProvider(apiKey: string) {
+  // Sanjeevni is a Gemini app. Do not let an old AI_BASE_URL setting
+  // silently redirect requests to another provider.
   return createOpenAICompatible({
     name: "google-gemini",
-    baseURL: process.env.AI_BASE_URL ?? GEMINI_BASE_URL,
-    headers: { Authorization: `Bearer ${apiKey}` },
+    baseURL: GEMINI_BASE_URL,
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "x-goog-api-client": "project-sanjeevni/1.0",
+    },
   });
 }
 
 export function getAiModel() {
-  return process.env.AI_CHAT_MODEL ?? "gemini-3.8-flash";
+  // Only accept a Gemini model override. This prevents a legacy value such
+  // as "gpt-4o-mini" from being sent to Google's endpoint.
+  const configured = process.env.GEMINI_CHAT_MODEL?.trim();
+  return configured?.startsWith("gemini-") ? configured : DEFAULT_GEMINI_MODEL;
 }

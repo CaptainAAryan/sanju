@@ -70,7 +70,8 @@ export const Route = createFileRoute("/api/chat")({
           }
 
           const gateway = createAiProvider(key);
-          console.info("[chat] Starting Gemini request", { model: getAiModel(), lang: body.lang ?? "en" });\n          const result = streamText({
+          console.info("[chat] Starting Gemini request", { model: getAiModel(), lang: body.lang ?? "en" });
+          const result = streamText({
             model: gateway(getAiModel()),
             system: systemPrompt(body.lang, body.profile),
             messages: await convertToModelMessages(body.messages as UIMessage[]),
